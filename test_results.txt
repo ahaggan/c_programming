@@ -1,0 +1,5 @@
+
+Input test 1: Passed
+
+**Check_input function PASSED all tests!**
+
