@@ -1,0 +1,1 @@
+For this assignment I took a test driven development approach to the design and implementation of my software. From difficulties implementing testing at the end of our group project I decided to take an approach that does this alongside writing the code. More about this in test.txt.

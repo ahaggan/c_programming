@@ -1,0 +1,1 @@
+I used test driven development to design and implement my progrm, this means that every piece of code written was in responce to a test that was written and so each piece of code is teated. The results of the test are written to a file called test_results.txt.
