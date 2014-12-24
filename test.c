@@ -1,18 +1,341 @@
-#include "parser.h"
 #include "test.h"
 
 void test(void){
 	FILE *test_pointer;
 	test_pointer = fopen("test_results.txt", "w");
+	fprintf(test_pointer, "Below are the test results for each function:\n");
     if (test_input(test_pointer) == PASSED){
-        fprintf(test_pointer, "\n\n**Check_input function PASSED all tests!**\n\n");
+        print_outcome(test_pointer, "Check_input", "PASSED");
     }
     else{
-        fprintf(test_pointer, "\n\n**Check_input function FAILED at least one test!**\n\n");
-    }      
+        print_outcome(test_pointer, "Check_input", "FAILED");
+    }   
+    
+    if (test_words_array(test_pointer) == PASSED){
+        print_outcome(test_pointer, "Test_words_array", "PASSED");
+    }
+    else{
+        print_outcome(test_pointer, "Test_words_array", "FAILED");
+    }
+    
+    if(test_validate(test_pointer) == PASSED){
+        print_outcome(test_pointer, "Test_validate", "PASSED");
+    }
+    else{
+        print_outcome(test_pointer, "Test_validate", "FAILED");
+    }
+    
+    if(test_instrctlst(test_pointer) == PASSED){
+        print_outcome(test_pointer, "Test_instrctlst", "PASSED");
+    }
+    else{
+        print_outcome(test_pointer, "Test_instrctlst", "FAILED");
+    }
+    
+    if(test_instruction(test_pointer) == PASSED){
+        print_outcome(test_pointer, "Test_instruction", "PASSED");
+    }
+    else{
+        print_outcome(test_pointer, "Test_instruction", "FAILED");
+    }
+    
+    if(test_fd(test_pointer) == PASSED){
+        print_outcome(test_pointer, "Test_fd", "PASSED");
+    }
+    else{
+        print_outcome(test_pointer, "Test_fd", "FAILED");
+    }
+    
+    if(test_lt(test_pointer) == PASSED){
+        print_outcome(test_pointer, "Test_lt", "PASSED");
+    }
+    else{
+        print_outcome(test_pointer, "Test_lt", "FAILED");
+    }
+    
+    if(test_rt(test_pointer) == PASSED){
+        print_outcome(test_pointer, "Test_rt", "PASSED");
+    }
+    else{
+        print_outcome(test_pointer, "Test_rt", "FAILED");
+    }
+}
+
+int test_rt(FILE *test_pointer){
+    prog program;
+    int pass_count = 0, no_of_tests = 0;
+    initialise_words_array(&program);
+    //Test should pass, is correct instruction followed by a number - the number is actually checked in a different function tested separately.
+    no_of_tests += 1;
+    strcpy(program.words[0], "RT");
+    strcpy(program.words[1], "10");
+    if(rt(&program) == TRUE){
+        fprintf(test_pointer, "\nRT test 1: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nRT test 1: Failed");
+    }
+    //test has a valid number, but incorrect instruction, test will pass if function returns FALSE
+    no_of_tests += 1;
+    strcpy(program.words[0], "LT");
+    strcpy(program.words[1], "10");
+    if(rt(&program) == FALSE){
+        fprintf(test_pointer, "\nRT test 2: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nRT test 2: Failed");
+    }
+    //test has a valid instruction, but not a number following so test will pass if function returns false.
+    no_of_tests += 1;
+    strcpy(program.words[0], "RT");
+    strcpy(program.words[1], "ten");
+    if(rt(&program) == FALSE){
+        fprintf(test_pointer, "\nRT test 3: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nRT test 3: Failed");
+    }
+    if(pass_count == no_of_tests){
+        return PASSED;
+    }
+    return NOT_PASSED;
+}
+
+int test_lt(FILE *test_pointer){
+    prog program;
+    int pass_count = 0, no_of_tests = 0;
+    initialise_words_array(&program);
+    //Test should pass, is correct instruction followed by a number - the number is actually checked in a different function tested separately.
+    no_of_tests += 1;
+    strcpy(program.words[0], "LT");
+    strcpy(program.words[1], "10");
+    if(lt(&program) == TRUE){
+        fprintf(test_pointer, "\nLT test 1: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nLT test 1: Failed");
+    }
+    //test has a valid number, but incorrect instruction, test will pass if function returns FALSE
+    no_of_tests += 1;
+    strcpy(program.words[0], "FD");
+    strcpy(program.words[1], "10");
+    if(lt(&program) == FALSE){
+        fprintf(test_pointer, "\nLT test 2: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nLT test 2: Failed");
+    }
+    //test has a valid instruction, but not a number following so test will pass if function returns false.
+    no_of_tests += 1;
+    strcpy(program.words[0], "LT");
+    strcpy(program.words[1], "ten");
+    if(lt(&program) == FALSE){
+        fprintf(test_pointer, "\nLT test 3: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nLT test 3: Failed");
+    }
+    if(pass_count == no_of_tests){
+        return PASSED;
+    }
+    return NOT_PASSED;
+}
+
+int test_fd(FILE *test_pointer){
+    prog program;
+    int pass_count = 0, no_of_tests = 0;
+    initialise_words_array(&program);
+    //Test should pass, is correct instruction followed by a number - the number is actually checked in a different function tested separately.
+    no_of_tests += 1;
+    strcpy(program.words[0], "FD");
+    strcpy(program.words[1], "10");
+    if(fd(&program) == TRUE){
+        fprintf(test_pointer, "\nFD test 1: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nFD test 1: Failed");
+    }
+    //test has a valid number, but incorrect instruction, test will pass if function returns FALSE
+    no_of_tests += 1;
+    strcpy(program.words[0], "FT");
+    strcpy(program.words[1], "10");
+    if(fd(&program) == FALSE){
+        fprintf(test_pointer, "\nFD test 2: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nFD test 2: Failed");
+    }
+    //test has a valid instruction, but not a number following so test will pass if function returns false.
+    no_of_tests += 1;
+    strcpy(program.words[0], "FD");
+    strcpy(program.words[1], "ten");
+    if(fd(&program) == FALSE){
+        fprintf(test_pointer, "\nFD test 3: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nFD test 3: Failed");
+    }
+    if(pass_count == no_of_tests){
+        return PASSED;
+    }
+    return NOT_PASSED;
 }
 
 
+int test_instruction(FILE *test_pointer){
+/*Function will call FD, LT and RT in turn*/
+    prog program;
+    int pass_count = 0, no_of_tests = 0;
+    initialise_words_array(&program);
+    //passing FD to function which should be correct, test should pass if TRUE is returned.
+    no_of_tests += 1;
+    strcpy(program.words[0], "FD");
+    strcpy(program.words[1], "10");
+    if (instruction(&program) == TRUE){
+        fprintf(test_pointer, "\nInstruction test 1: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nInstruction test 1: Failed");
+    }
+    
+    //passing LT to function which should be correct, test should pass if TRUE is returned.
+    no_of_tests += 1;
+    program.current_word = 0;
+    strcpy(program.words[0], "LT");
+    strcpy(program.words[1], "10");
+    if (instruction(&program) == TRUE){
+        fprintf(test_pointer, "\nInstruction test 2: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nInstruction test 2: Failed");
+    }
+    
+    //passing RT to function which should be correct, test should pass if TRUE is returned.
+    no_of_tests += 1;
+    program.current_word = 0;
+    strcpy(program.words[0], "RT");
+    strcpy(program.words[1], "10");
+    if (instruction(&program) == TRUE){
+        fprintf(test_pointer, "\nInstruction test 3: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nInstruction test 3: Failed");
+    }
+    
+    //passing an incorrect word to function which should not be correct, test should pass if FALSE is returned.
+    no_of_tests += 1;
+    program.current_word = 0;
+    strcpy(program.words[0], "something");
+    strcpy(program.words[1], "10");
+    if (instruction(&program) == FALSE){
+        fprintf(test_pointer, "\nInstruction test 4: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nInstrctlst test 4: Failed");
+    }
+    
+    if(pass_count == no_of_tests){
+        return PASSED;
+    }
+    return NOT_PASSED;
+}
+
+int test_instrctlst(FILE *test_pointer){
+/*Function should return TRUE if the current word is } otherwise, should call the instruction followed by itself.*/
+    prog program;
+    int pass_count = 0, no_of_tests = 0;
+    initialise_words_array(&program);
+    
+    //passes an incorrect word to instrctlst, this should be passes along and eventually return FALSE.
+    no_of_tests += 1;
+    strcpy(program.words[0], "Hello");
+    if (instrctlst(&program) == FALSE){
+        fprintf(test_pointer, "\nInstrctlst test 1: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nInstrctlst test 1: Failed");
+    }
+    
+    //passes a correct program end so should return TRUE
+    no_of_tests += 1;
+    strcpy(program.words[0], "}");
+    if (instrctlst(&program) == TRUE){
+        fprintf(test_pointer, "\nInstrctlst test 2: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nInstrctlst test 2: Failed");
+    }
+    
+    if(pass_count == no_of_tests){
+        return PASSED;
+    }
+    return NOT_PASSED;
+}
+
+int test_validate(FILE *test_pointer){
+/*Tests need to check that the function only works if the program
+starts with a {, all other checks are done in other functions.*/ 
+    prog program;
+    int pass_count = 0, no_of_tests = 0;
+    initialise_words_array(&program);
+    //Function is given an incorrect starting word, will pass if FALSE is returned
+    no_of_tests += 1;
+    strcpy(program.words[0], "Hello");
+    if (validate(&program) == FALSE){
+        fprintf(test_pointer, "\nValidate test 1: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nValidate test 1: Failed");
+    }
+    
+    //function is given the most basic starting program, will pass if TRUE is returned, this is sort of testing the next function as well.
+    no_of_tests += 1;
+    strcpy(program.words[0], "{");
+    strcpy(program.words[1], "}");
+    if (validate(&program) == FALSE){
+        fprintf(test_pointer, "\nValidate test 2: Failed");
+    }
+    else{
+        fprintf(test_pointer, "\nValidate test 2: Passed");
+        pass_count += 1;
+    }
+    
+    if(pass_count == no_of_tests){
+        return PASSED;
+    }
+    return NOT_PASSED;
+}
+
+void print_outcome(FILE *test_pointer, char *test, char *outcome){
+    fprintf(test_pointer, "\n\n**%s function %s!**\n\n", test, outcome);
+}
+
+int test_words_array(FILE *test_pointer){
+    prog test_program;
+    initialise_words_array(&test_program);
+    for(int i = 0; i < PROGRAM_LENGTH; i++){
+        if(test_program.words[i][0] != '\0'){
+            return NOT_PASSED;
+        }
+    }
+    return PASSED;
+}
 int test_input(FILE *test_pointer){
     FILE *file_pointer;
     int pass_count = 0, no_of_tests = 0;
