@@ -2,29 +2,36 @@
 
 int main(int argc, char **argv){
    	FILE *file_pointer;
-    file_pointer = check_input(argc, argv);
     prog program;
     
-    int i;
-    //test();
-    
     initialise_words_array(&program);
+    file_pointer = check_input(&program, argc, argv);
+    program.file_pointer = file_pointer;
+    return run(&program);
     
-    if(file_pointer == NULL){
-        exit(1);
+}
+
+int run(prog *program){
+    int i = 0;
+    if(program->file_pointer == NULL){
+        if(program->test == TRUE){
+            test();
+            return 0;
+        }
+        return 1;
     }
-    i = 0;
-    while(fscanf(file_pointer, "%s", program.words[i]) != EOF && i < PROGRAM_LENGTH){
+    
+    while(fscanf(program->file_pointer, "%s", program->words[i]) != EOF && i < PROGRAM_LENGTH){
         i++;
     }
     if(i == PROGRAM_LENGTH){
         fprintf(stdout, "\nYour program may be too long for the parser to handle.\n");
     }
-    if (validate(&program) == FALSE){
+    if (validate(program) == FALSE){
         exit(1);
     }
     fprintf(stdout, "\nPARSED OK!");
-    draw_turtle(&program);
+    draw_turtle(program);
     return 0;
 }
 
@@ -73,11 +80,13 @@ int instruction(prog *program){
     if(rt(program) == TRUE){
         return TRUE;
     }
+    
     if(program->words[program->current_word][0] == '\0'){
         fprintf(stdout, "\nProgram needs to end with '}'.");
     }
     else{
         fprintf(stdout, "\nERROR in the word '%s'", program->words[program->current_word]);   //NEED TO LOOK HOW TO GIVE END MESSAGE
+        program->current_word += 1;
     }
     return FALSE;
 }
@@ -127,8 +136,10 @@ int rt(prog *program){
 }
 
 void assign_draw(prog *program){
+    //printf("\nCurrent angle = %d", program->current_angle);
     program->current_angle = make_positive(program->current_angle); //incase current angle has become negative
-    program->current_angle = program->current_angle % 360; //incase turtle has rotated more than 360 degrees
+    //printf("\nCurrent angle = %d", program->current_angle);
+   
     set_new_xy(program);
     program->draw[program->draw_pointer] = program->current_x;
     program->draw_pointer += 1;
@@ -137,38 +148,47 @@ void assign_draw(prog *program){
 }
 
 void set_new_xy(prog *program){
-    int tmp_angle;
-    tmp_angle = program->current_angle % 90;
+    double tmp_angle;
+    tmp_angle = DEGTORAD(program->current_angle % 90);
     if(program->current_angle >= 270){
-        printf("\nGreater than 270");
+        //printf("\nGreater than 270");
+        printf("\nSin of angle %lf: %lf", tmp_angle, sin(tmp_angle));
+        printf("\nCos of angle %lf: %lf", tmp_angle, cos(tmp_angle));
         program->current_x -= (cos(tmp_angle) * program->current_length);
         program->current_y -= (sin(tmp_angle) * program->current_length);
     }
     else if(program->current_angle >= 180){
-        printf("\nGreater than 180");
+        //printf("\nGreater than 180");
+        printf("\nSin of angle %lf: %lf", tmp_angle, sin(tmp_angle));
+        printf("\nCos of angle %lf: %lf", tmp_angle, cos(tmp_angle));
         program->current_x -= (sin(tmp_angle) * program->current_length);
         program->current_y += (cos(tmp_angle) * program->current_length);
     }
     else if(program->current_angle >= 90){
-        printf("\nGreater than 90");
+        //printf("\nGreater than 90");
+        printf("\nSin of angle %lf: %lf", tmp_angle, sin(tmp_angle));
+        printf("\nCos of angle %lf: %lf", tmp_angle, cos(tmp_angle));
         program->current_x += (cos(tmp_angle) * program->current_length);
         program->current_y += (sin(tmp_angle) * program->current_length);
     }
     else{
-        printf("\nGreater than 0");
-        printf("\nCurrent angle: %d", program->current_angle);
-        printf("\nCurrent x: %d", program->current_x);
-        printf("\nCurrent y: %d", program->current_y);
+        //printf("\nGreater than 0");
+        //printf("\nCurrent angle: %d", program->current_angle);
+        //printf("\nCurrent x: %d", program->current_x);
+        //printf("\nCurrent y: %d", program->current_y);
+        printf("\nSin of angle %lf: %lf", tmp_angle, sin(tmp_angle));
+        printf("\nCos of angle %lf: %lf", tmp_angle, cos(tmp_angle));
         program->current_x += (sin(tmp_angle) * program->current_length);
         program->current_y -= (cos(tmp_angle) * program->current_length);
-        printf("\nCurrent x: %d", program->current_x);
-        printf("\nCurrent y: %d", program->current_y);
+        //printf("\nCurrent x: %d", program->current_x);
+        //printf("\nCurrent y: %d", program->current_y);
     }
 }
 
 int make_positive(int angle){
+    
     if(angle >= 0){
-        return angle;
+        return angle % 360;
     }
     else{
         return make_positive(angle+360);
@@ -176,7 +196,18 @@ int make_positive(int angle){
 }
 
 int varnum(prog *program){
-    int number;
+    int number, word_length, i;
+    word_length = strlen(program->words[program->current_word]);
+    if(!isdigit(program->words[program->current_word][0]) && program->words[program->current_word][0] != '-'){
+        return FALSE;
+    }
+    
+    for( i = 1; i < word_length; i++){
+        if(!isdigit(program->words[program->current_word][i])){
+            fprintf(stdout, "\nThe value %s, is not valid with operation %s. Needs to be a whole number at least 1", program->words[program->current_word], program->words[program->current_word - 1]);
+            return FALSE;
+        }
+    }
     number = atoi(program->words[program->current_word]);
     if(number == 0){
         fprintf(stdout, "\nThe value %s, is not valid with operation %s. Needs to be a whole number above 1", program->words[program->current_word], program->words[program->current_word - 1]);
@@ -190,6 +221,7 @@ void initialise_words_array(prog *program){
     program->current_y = WINDOW_HEIGHT/2;
     program->current_angle = 0;
     program->draw_pointer = 2;
+    program->test = FALSE;
     //Sets the first letter of each word to the NULL character
     for(int i = 0; i < PROGRAM_LENGTH; i++){
         program->words[i][0] = '\0';
@@ -200,19 +232,17 @@ void initialise_words_array(prog *program){
     program->draw[1] = WINDOW_HEIGHT/2;
 }
 
-FILE* check_input(int argc, char **argv){
-    FILE *file_pointer;
+FILE* check_input(prog *program, int argc, char **argv){
+    FILE *file_pointer = NULL;
     
-    if(!(argc == 2 || argc == 3)){
-        fprintf(stdout, "\nYou must enter 2 or 3 commands:\n   the first should be the executable file,\n   the second should be the text file to read from,\n   the third, if wanted should be the word 'test' this will run the test function");
+    if(!(argc == 2)){
+        fprintf(stdout, "\nYou must enter 2 commands:\n   the first should be the executable file,\n   the second should be the text file to read from,\n   or, if wanted should be the word 'test' this will run the test function");
         return NULL;
     }
-    if(argc == 3){
-    	if(!(strings_match(argv[2], "test"))){
-    		fprintf(stdout, "\nYour 3rd input needs to be the word 'test', if used at all.");
-    		return NULL;
-    	}
-    	
+    
+    if(strings_match(argv[1], "test")){
+        program->test = TRUE;
+        return NULL;
     }
     if((file_pointer = fopen(argv[1], "r")) == NULL){
         fprintf(stdout, "\nCan't open the file you have specified");

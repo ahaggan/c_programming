@@ -1,3 +1,5 @@
+//Some functions taken from Neill_sdl.c
+
 #include "ashley_sdl.h"
 
 
@@ -55,10 +57,11 @@ void Neill_SDL_RenderDrawCircle(SDL_Renderer *rend, int cx, int cy, int r)
 }
 void draw_turtle(prog *program){
     SDL_Simplewin sw;
-    int i = 0, startx, starty, endx, endy;
+    int i = 0;
+    double startx, starty, endx, endy;
     Neill_SDL_Init(&sw);
     do{
-        if(program->draw[i+3] != -1){
+        if(program->draw[i+3] != -1){ //Checks the program contains enough istruction for the next loop
             startx = program->draw[i];
             i++;
             starty = program->draw[i];
@@ -68,6 +71,10 @@ void draw_turtle(prog *program){
             endy = program->draw[i];
             i--;
             Neill_SDL_SetDrawColour(&sw, 255, 255, 255);
+            printf("\nStart x: %lf", startx);
+            printf("\nStart y: %lf", starty);
+            printf("\nEnd x: %lf", endx);
+            printf("\nEnd y: %lf", endy);
             SDL_RenderDrawLine(sw.renderer, startx, starty, endx, endy);
             // Sleep for a short time
             SDL_Delay(MILLISECONDDELAY);

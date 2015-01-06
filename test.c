@@ -59,6 +59,133 @@ void test(void){
     else{
         print_outcome(test_pointer, "Test_rt", "FAILED");
     }
+    
+    if(test_make_positive(test_pointer) == PASSED){
+        print_outcome(test_pointer, "Test_make_positive", "PASSED");
+    }
+    else{
+        print_outcome(test_pointer, "Test_make_positive", "FAILED");
+    }
+    
+    if(test_assign_draw(test_pointer) == PASSED){
+        print_outcome(test_pointer, "Test_assign_draw", "PASSED");
+    }
+    else{
+        print_outcome(test_pointer, "Test_assign_draw", "FAILED");
+    }
+    
+    if(test_varnum(test_pointer) == PASSED){
+        print_outcome(test_pointer, "Test_varnum", "PASSED");
+    }
+    else{
+        print_outcome(test_pointer, "Test_varnum", "FAILED");
+    }
+    
+}
+
+int test_varnum(FILE *test_pointer){
+    prog program;
+    int pass_count = 0, no_of_tests = 0;
+    initialise_words_array(&program);
+    
+    program.current_word = 1;
+    no_of_tests += 1;
+    strcpy(program.words[0], "RT");
+    strcpy(program.words[1], "40");
+    if(varnum(&program) == TRUE){
+        fprintf(test_pointer, "\nVarnum test 1: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nVarnum test 1: Failed");
+    }
+    
+    program.current_word = 1;
+    no_of_tests += 1;
+    strcpy(program.words[0], "RT");
+    strcpy(program.words[1], "-3g");
+    if(varnum(&program) == FALSE){
+        fprintf(test_pointer, "\nVarnum test 2: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nVarnum test 2: Failed");
+    }
+    
+    program.current_word = 1;
+    no_of_tests += 1;
+    strcpy(program.words[0], "RT");
+    strcpy(program.words[1], "-30");
+    if(varnum(&program) == TRUE){
+        fprintf(test_pointer, "\nVarnum test 3: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nVarnum test 3: Failed");
+    }
+    
+    if(pass_count == no_of_tests){
+        return PASSED;
+    }
+    return NOT_PASSED;
+}
+
+int test_assign_draw(FILE *test_pointer){
+    /*  Not sure how to test this function
+    prog program;
+    int pass_count = 0, no_of_tests = 0;
+    initialise_words_array(&program);
+    
+    no_of_tests += 1;
+    program.current_angle = 90;
+    program.current_length = 50;
+    assign_draw(&program);
+    
+    strcpy(program.words[0], "FD");
+    strcpy(program.words[1], "ten");
+    if(fd(&program) == FALSE){
+        fprintf(test_pointer, "\nFD test 3: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nFD test 3: Failed");
+    }
+    
+    if(pass_count == no_of_tests){
+        return PASSED;
+    }
+    return NOT_PASSED;
+    */
+    return PASSED;
+}
+
+int test_make_positive(FILE *test_pointer){
+    int pass_count = 0, no_of_tests = 0, test_number;
+    //Should always return a positive number, but not the positive version of the number given - is modded with 360 later.
+    no_of_tests += 1;
+    test_number = 50;
+    if(make_positive(test_number) > 0){
+        fprintf(test_pointer, "\nmake_positive test 1: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nmake_positive test 1: Failed");
+    }
+    
+    no_of_tests += 1;
+    test_number = -50;
+    if(make_positive(test_number) > 0){
+        fprintf(test_pointer, "\nmake_positive test 2: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nmake_positive test 2: Failed");
+    }
+    
+    if(pass_count == no_of_tests){
+        return PASSED;
+    }
+    return NOT_PASSED;
 }
 
 int test_rt(FILE *test_pointer){
@@ -87,7 +214,7 @@ int test_rt(FILE *test_pointer){
     else{
         fprintf(test_pointer, "\nRT test 2: Failed");
     }
-    //test has a valid instruction, but not a number following so test will pass if function returns false.
+    //test has a valid instruction, but not a number following so test will pass if function returns FALSE.
     no_of_tests += 1;
     strcpy(program.words[0], "RT");
     strcpy(program.words[1], "ten");
@@ -98,6 +225,53 @@ int test_rt(FILE *test_pointer){
     else{
         fprintf(test_pointer, "\nRT test 3: Failed");
     }
+    
+    no_of_tests += 1;
+    strcpy(program.words[0], "RT");
+    strcpy(program.words[1], "gh");
+    if(rt(&program) == FALSE){
+        fprintf(test_pointer, "\nRT test 4: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nRT test 4: Failed");
+    }
+    
+    no_of_tests += 1;
+    strcpy(program.words[0], "RT");
+    strcpy(program.words[1], "-gh");
+    if(rt(&program) == FALSE){
+        fprintf(test_pointer, "\nRT test 5: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nRT test 5: Failed");
+    }
+    
+    no_of_tests += 1;
+    strcpy(program.words[0], "RT");
+    strcpy(program.words[1], "-4gh");
+    if(rt(&program) == FALSE){
+        fprintf(test_pointer, "\nRT test 6: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nRT test 6: Failed");
+    }
+    
+    no_of_tests += 1;
+    strcpy(program.words[0], "RT");
+    strcpy(program.words[1], "4gh");
+    if(rt(&program) == FALSE){
+        fprintf(test_pointer, "\nRT test 7: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nRT test 7: Failed");
+    }
+    
+    
+    
     if(pass_count == no_of_tests){
         return PASSED;
     }
@@ -272,7 +446,8 @@ int test_instrctlst(FILE *test_pointer){
     
     //passes a correct program end so should return TRUE
     no_of_tests += 1;
-    strcpy(program.words[0], "}");
+    strcpy(program.words[0], "{");
+    strcpy(program.words[1], "}");
     if (instrctlst(&program) == TRUE){
         fprintf(test_pointer, "\nInstrctlst test 2: Passed");
         pass_count += 1;
@@ -336,8 +511,10 @@ int test_words_array(FILE *test_pointer){
     }
     return PASSED;
 }
+
 int test_input(FILE *test_pointer){
     FILE *file_pointer;
+    prog test_program;
     int pass_count = 0, no_of_tests = 0;
     int argc = 2; //argc values that would be read from command line, will be changed to test for different inputs
     char **test_array;
@@ -347,7 +524,7 @@ int test_input(FILE *test_pointer){
     no_of_tests += 1;
     test_array[0] = "prog_name";
     test_array[1] = "program.txt";
-    file_pointer = check_input(argc, test_array);
+    file_pointer = check_input(&test_program, argc, test_array);
     if(file_pointer == NULL){
         fprintf(test_pointer, "\nInput test 1: Failed");  
     }
@@ -359,7 +536,7 @@ int test_input(FILE *test_pointer){
     no_of_tests += 1;
     test_array[0] = "prog_name";
     test_array[1] = "progrm.txt"; //Incorrect file name
-    file_pointer = check_input(argc, test_array);
+    file_pointer = check_input(&test_program, argc, test_array);
     if(file_pointer == NULL){
         fprintf(test_pointer, "\nInput test 2: Passed");  
         pass_count += 1;
@@ -374,7 +551,7 @@ int test_input(FILE *test_pointer){
     test_array[0] = "prog_name";
     test_array[1] = "program.txt";
     test_array[2] = "hello"; 
-    file_pointer = check_input(argc, test_array);
+    file_pointer = check_input(&test_program, argc, test_array);
     if(file_pointer == NULL){
         fprintf(test_pointer, "\nInput test 3: Passed");  
         pass_count += 1;
@@ -384,26 +561,24 @@ int test_input(FILE *test_pointer){
         //pass_count += 1;
     }
     
-    //Test for 3 correct inputs, test will fail if function returns NULL
+    //Test for input 'test', test will pass if function returns NULL and sets test element of program to TRUE.
     no_of_tests += 1;
-    argc = 3;
+    argc = 2;
     test_array[0] = "prog_name";
-    test_array[1] = "program.txt";
-    test_array[2] = "test"; 
-    file_pointer = check_input(argc, test_array);
-    if(file_pointer == NULL){
-        fprintf(test_pointer, "\nInput test 4: Failed");  
-        //pass_count += 1;
+    test_array[1] = "test";
+    file_pointer = check_input(&test_program, argc, test_array);
+    if(file_pointer == NULL && test_program.test == TRUE){
+        fprintf(test_pointer, "\nInput test 4: Passed");  
+        pass_count += 1;
     }
     else{
-        fprintf(test_pointer, "\nInput test 4: Passed");
-        pass_count += 1;
+        fprintf(test_pointer, "\nInput test 4: Failed");
     }
     //Tests for too few inputs, will pass if check_input returns NULL
     no_of_tests += 1;
     argc = 1;
     test_array[0] = "prog_name";
-    file_pointer = check_input(argc, test_array);
+    file_pointer = check_input(&test_program, argc, test_array);
     if(file_pointer == NULL){
         fprintf(test_pointer, "\nInput test 5: Passed");  
         pass_count += 1;

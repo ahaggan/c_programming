@@ -13,3 +13,6 @@ int test_instruction(FILE *test_pointer);
 int test_fd(FILE *test_pointer);
 int test_lt(FILE *test_pointer);
 int test_rt(FILE *test_pointer);
+int test_make_positive(FILE *test_pointer);
+int test_assign_draw(FILE *test_pointer);
+int test_varnum(FILE *test_pointer);
