@@ -61,7 +61,8 @@ void draw_turtle(prog *program){
     double startx, starty, endx, endy;
     Neill_SDL_Init(&sw);
     do{
-        if(program->draw[i+3] != -1){ //Checks the program contains enough istruction for the next loop
+        //Checks the program still contains instruction to draw, otherwise the loop waits for the user to stop it.
+        if(program->draw[i+3] != -1){ 
             startx = program->draw[i];
             i++;
             starty = program->draw[i];
@@ -71,10 +72,10 @@ void draw_turtle(prog *program){
             endy = program->draw[i];
             i--;
             Neill_SDL_SetDrawColour(&sw, 255, 255, 255);
-            printf("\nStart x: %lf", startx);
-            printf("\nStart y: %lf", starty);
-            printf("\nEnd x: %lf", endx);
-            printf("\nEnd y: %lf", endy);
+            //printf("\nStart x: %lf", startx);
+            //printf("\nStart y: %lf", starty);
+            //printf("\nEnd x: %lf", endx);
+            //printf("\nEnd y: %lf", endy);
             SDL_RenderDrawLine(sw.renderer, startx, starty, endx, endy);
             // Sleep for a short time
             SDL_Delay(MILLISECONDDELAY);

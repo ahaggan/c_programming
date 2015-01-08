@@ -67,7 +67,7 @@ void test(void){
         print_outcome(test_pointer, "Test_make_positive", "FAILED");
     }
     
-    if(test_assign_draw(test_pointer) == PASSED){
+    if(test_assign_draw(test_pointer) == PASSED){ //Not sure how to test this?
         print_outcome(test_pointer, "Test_assign_draw", "PASSED");
     }
     else{
@@ -81,6 +81,22 @@ void test(void){
         print_outcome(test_pointer, "Test_varnum", "FAILED");
     }
     
+    if(test_push(test_pointer) == PASSED){
+        print_outcome(test_pointer, "Test_push", "PASSED");
+    }
+    else{
+        print_outcome(test_pointer, "Test_push", "FAILED");
+    }
+}
+
+int test_push(FILE *test_pointer){
+    prog program;
+    initialise_words_array(&program);
+    push(program.polish, 10);
+    push(program.polish, 20);
+    printf("\nNumber 1: %lf", pop(program.polish));
+    printf("\nNumber 2: %lf", pop(program.polish));
+    return PASSED;
 }
 
 int test_varnum(FILE *test_pointer){
@@ -122,6 +138,18 @@ int test_varnum(FILE *test_pointer){
     }
     else{
         fprintf(test_pointer, "\nVarnum test 3: Failed");
+    }
+    
+    program.current_word = 1;
+    no_of_tests += 1;
+    strcpy(program.words[0], "RT");
+    strcpy(program.words[1], "A");
+    if(varnum(&program) == TRUE){
+        fprintf(test_pointer, "\nVarnum test 4: Passed");
+        pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nVarnum test 4: Failed");
     }
     
     if(pass_count == no_of_tests){
