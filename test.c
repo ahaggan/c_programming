@@ -4,14 +4,14 @@ void test(void){
 	FILE *test_pointer;
 	test_pointer = fopen("test_results.txt", "w");
 	fprintf(test_pointer, "Below are the test results for each function:\n");
-    if (test_input(test_pointer) == PASSED){
+    if (test_check_input(test_pointer) == PASSED){
         print_outcome(test_pointer, "Check_input", "PASSED");
     }
     else{
         print_outcome(test_pointer, "Check_input", "FAILED");
     }   
     
-    if (test_words_array(test_pointer) == PASSED){
+    if (test_initialise_words_array(test_pointer) == PASSED){
         print_outcome(test_pointer, "Test_words_array", "PASSED");
     }
     else{
@@ -89,6 +89,10 @@ void test(void){
     }
 }
 
+int is_true((int)(*test_function)(Prog), Prog test_program){
+    return test_function(test_program);
+}
+
 int test_push(FILE *test_pointer){
     prog program;
     initialise_words_array(&program);
@@ -108,7 +112,7 @@ int test_varnum(FILE *test_pointer){
     no_of_tests += 1;
     strcpy(program.words[0], "RT");
     strcpy(program.words[1], "40");
-    if(varnum(&program) == TRUE){
+    if(is_true(varnum(&program), program)){
         fprintf(test_pointer, "\nVarnum test 1: Passed");
         pass_count += 1;
     }
@@ -511,12 +515,13 @@ starts with a {, all other checks are done in other functions.*/
     no_of_tests += 1;
     strcpy(program.words[0], "{");
     strcpy(program.words[1], "}");
-    if (validate(&program) == FALSE){
-        fprintf(test_pointer, "\nValidate test 2: Failed");
-    }
-    else{
+    if (validate(&program) == TRUE){
         fprintf(test_pointer, "\nValidate test 2: Passed");
         pass_count += 1;
+    }
+    else{
+        fprintf(test_pointer, "\nValidate test 2: Failed");
+        
     }
     
     if(pass_count == no_of_tests){
@@ -529,7 +534,7 @@ void print_outcome(FILE *test_pointer, char *test, char *outcome){
     fprintf(test_pointer, "\n\n**%s function %s!**\n\n", test, outcome);
 }
 
-int test_words_array(FILE *test_pointer){
+int test_initialise_words_array(FILE *test_pointer){
     prog test_program;
     initialise_words_array(&test_program);
     for(int i = 0; i < PROGRAM_LENGTH; i++){
@@ -540,7 +545,7 @@ int test_words_array(FILE *test_pointer){
     return PASSED;
 }
 
-int test_input(FILE *test_pointer){
+int test_check_input(FILE *test_pointer){
     FILE *file_pointer;
     prog test_program;
     int pass_count = 0, no_of_tests = 0;

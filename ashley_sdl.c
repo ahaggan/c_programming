@@ -1,4 +1,4 @@
-//Some functions taken from Neill_sdl.c
+//Some functions taken from Neill_sdl.c, these have Neill in the function name
 
 #include "ashley_sdl.h"
 

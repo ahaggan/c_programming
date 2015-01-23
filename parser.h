@@ -70,4 +70,4 @@ int varnum(prog *program);
 void draw_turtle(prog *program);
 //Adds the x and y coordinates of the next point to draw to into a draw array.
 void assign_draw(prog *program);
-void set_new_xy(prog *program);
+void set_new_xy(prog *program); 
