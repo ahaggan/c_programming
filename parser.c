@@ -2,24 +2,26 @@
 
 int main(int argc, char **argv){
    	FILE *file_pointer;
-    prog program;
+    Prog program;
     
     initialise_words_array(&program);
     
     file_pointer = check_input(&program, argc, argv);
     program.file_pointer = file_pointer;
-    return run(&program);
+    if(parse(&program) == TRUE){
+        draw_turtle(&program);
+    }
     
 }
 
-int run(prog *program){
+int parse(Prog *program){
     int i = 0;
     if(program->file_pointer == NULL){
         if(program->test == TRUE){
             test();
-            return 0;
+            return TRUE;
         }
-        return 1;
+        return FALSE;
     }
     
     while(fscanf(program->file_pointer, "%s", program->words[i]) != EOF && i < PROGRAM_LENGTH){
@@ -29,19 +31,16 @@ int run(prog *program){
         fprintf(stdout, "\nYour program may be too long for the parser to handle.\n");
     }
     if (validate(program) == FALSE){
-        exit(1);
+        return FALSE;
     }
-    printf("\nBefore draw");
-    /*for(int i = 0; i < LETTERS; i++){
-        printf("\nLetter: %lf", program->variable[i]);   
-    }*/
+    
+    
     fprintf(stdout, "\nPARSED OK!");
-    draw_turtle(program);
-    return 0;
+    return TRUE;
 }
 
-int validate(prog *program){
-    printf("\nIn validate");
+int validate(Prog *program){
+    //printf("\nIn validate");
     for(int i = 0; i < LETTERS; i++){
         //printf("\nLetter: %lf", program->variable[i]);   
     }
@@ -62,7 +61,7 @@ int validate(prog *program){
     return TRUE;
 }
 
-int instrctlst(prog *program){
+int instrctlst(Prog *program){
     if(strings_match(program->words[program->current_word], "}")){
         return TRUE;
     }
@@ -77,7 +76,7 @@ int instrctlst(prog *program){
     return FALSE;
 }
 
-int instruction(prog *program){
+int instruction(Prog *program){
     if(fd(program) == TRUE){
         return TRUE;
     }
@@ -103,84 +102,104 @@ int instruction(prog *program){
         fprintf(stdout, "\nProgram needs to end with '}'.");
     }
     else{
-        fprintf(stdout, "\nERROR in the word '%s'", program->words[program->current_word]);   //NEED TO LOOK HOW TO GIVE END MESSAGE
+//Not sure wether to include this error
+       fprintf(stdout, "\nERROR around the word '%s'", program->words[program->current_word]);   //NEED TO LOOK HOW TO GIVE END MESSAGE
         program->current_word += 1;
     }
     return FALSE;
 }
 
-int loop(prog *program){
-    int start, stop, i, variable_index, program_marker;
+int loop(Prog *program){
+    
     if(!(strings_match(program->words[program->current_word], "DO"))){
+        //fprintf(stdout,"\nA loop needs to begin with the word DO\n");
         return FALSE;
     }
     program->current_word += 1;
-    if(isVar(program) == FALSE){
+    if(is_var(program) == FALSE){
+        fprintf(stdout,"\nThe word DO needs to be follwed by a variable A - Z\n");
         return FALSE;
     }
-    variable_index = program->words[program->current_word][0] - 'A';
+    program->loop[letter] = program->words[program->current_word][0] - 'A';
     program->current_word += 1;
+    
+    if (loop_condition(program) == FALSE){
+        return FALSE;
+    }
+    program->current_word += 1;
+    
+    if(!(strings_match(program->words[program->current_word], "{"))){
+        fprintf(stdout,"\nThe condition statement in a loop needs to end with a {\n");
+        return FALSE;
+    }
+    
+    return perform_loop(program);
+} 
+
+int loop_condition(Prog *program){
     if(!(strings_match(program->words[program->current_word], "FROM"))){
+        fprintf(stdout, "\nThe variable in your loop needs to be followed by the word FROM\n");
         return FALSE;
     }
     program->current_word += 1;
-    if(varnum(program) == TRUE){
-        if(isVar(program) == TRUE){
-            start = program->variable[program->words[program->current_word][0] - 'A'];
-        }
-        else{
-            start = atoi(program->words[program->current_word]);
-        }
-    }
-    else{
+    if((program->loop[start] = get_parameter(program)) == -1){
+        fprintf(stdout, "\nThe word FROM needs to be follwed by a variable A - Z or a number\n");
         return FALSE;
     }
+    
     
     program->current_word += 1;
     
     if(!(strings_match(program->words[program->current_word], "TO"))){
+        fprintf(stdout, "\nThe word DO needs to be follwed by a variable A - Z\n");
         return FALSE;
     }
     
     program->current_word += 1;
     
+    if((program->loop[stop] = get_parameter(program)) == -1){
+        fprintf(stdout, "\nThe word TO needs to be follwed by a variable A - Z or a number\n");
+        return FALSE;
+    }
+    return TRUE;
+}
+
+int get_parameter(Prog *program){
+
     if(varnum(program) == TRUE){
-        if(isVar(program) == TRUE){
-            stop = program->variable[program->words[program->current_word][0] - 'A'];
+        if(is_var(program) == TRUE){
+            return program->variable[program->words[program->current_word][0] - 'A'];
         }
         else{
-            stop = atoi(program->words[program->current_word]);
+            return atoi(program->words[program->current_word]);
         }
     }
     else{
+        return -1;
+    }
+
+}
+
+int perform_loop(Prog *program){
+    int program_marker, i;
+    if(program->loop[start] > program->loop[stop]){
+        fprintf(stdout, "\nThe start of your loop has to be less than the end\n");
         return FALSE;
     }
     
-    if(start > stop){
-        return FALSE;
-    }
-    
-    program->current_word += 1;
-    
-    if(!(strings_match(program->words[program->current_word], "{"))){
-        return FALSE;
-    }
     program->current_word += 1;
     program_marker = program->current_word;
-    printf("\nBefore for loop...");
-    for(i = start; i <= stop ; i++){
-        
-        
-        program->variable[variable_index] = i;
+    for(i = program->loop[start]; i <= program->loop[stop] ; i++){
+        program->variable[program->loop[letter]] = i;
         program->current_word = program_marker;
         if (instrctlst(program) == FALSE){
             return FALSE;
         }
     }
     return TRUE;
-} 
+}
     
-int set(prog *program){
+int set(Prog *program){
     //printf("\nIn Set");
     int variable_index;
     if(!(strings_match(program->words[program->current_word], "SET"))){
@@ -188,57 +207,54 @@ int set(prog *program){
     }
     program->current_word += 1;
     
-    if (isVar(program) == FALSE){
+    if (is_var(program) == FALSE){
+        fprintf(stdout, "\nOperation SET needs to be followed by a variable A - Z\n");
         return FALSE;
     }
     
     variable_index = program->words[program->current_word][0] - 'A';
-    printf("\nVariable_index = %d", variable_index); 
+    //printf("\nVariable_index = %d", variable_index); 
     program->current_word += 1;
     if(!(strings_match(program->words[program->current_word], ":="))){
         return FALSE;
     }
     program->current_word += 1; 
     if(polish(program) == TRUE){  
-        printf("\nVariable_index = %d", variable_index);
-        printf("\nVariable c = %lf", program->result);
-        program->variable[variable_index] = program->result;
+        if(strings_match(program->words[program->current_word - 1], ":=")){
+            fprintf(stdout, "\nNeed to enter a nuber of variable to SET a value to.\n");
+            return FALSE;
+        }
+            program->variable[variable_index] = program->result;
         return TRUE;
     }
     return FALSE;
 }
 
-int polish(prog *program){
+int polish(Prog *program){
     //printf("\nIn Polish");
     int variable_index;
-    //int tmp_int1, tmp_int2;
-    //polish_list *tmp_list;
-    //tmp_list = (polish_list*)malloc(sizeof(polish_list));
+    
     if(strings_match(program->words[program->current_word], ";")){
-        /*if(program->result != NULL){   //Is this a good way to check no result has been calculated? 
-            printf("\nYou need to assign a numerical value using the SET function");
-            return FALSE;
-        else{*/
+        
             program->result = pop(program->polish);
             return TRUE;
-        //}
-    }
-    else if(op(program) == TRUE){
         
-        program->current_word += 1;
-        return polish(program);
     }
     else if(varnum(program) == TRUE){
-        if(isVar(program) == TRUE){
+        if(is_var(program) == TRUE){
             variable_index = program->words[program->current_word][0] - 'A';
            
             push(program->polish, program->variable[variable_index]);
         }
         else{
-            //printf("\nNumber to set = %d", atoi(program->words[program->current_word]));
+            
             push(program->polish, atof(program->words[program->current_word]));
-            //printf("\nNumber in stack = %d", pop(program->polish));
+            
         }
+        program->current_word += 1;
+        return polish(program);
+    }
+    else if(op(program) == TRUE){
         
         program->current_word += 1;
         return polish(program);
@@ -250,9 +266,11 @@ int polish(prog *program){
 
 
 
-int op(prog *program){
+int op(Prog *program){
     //printf("\nIn Op");
     if(check_stack(program) == FALSE){
+    
+        fprintf(stdout, "\nAn operation +, -, * or / needs to be preceeded by at least 2 numbers or variables\n");
         return FALSE;
     }
     else if(strings_match(program->words[program->current_word], "+")){
@@ -275,6 +293,9 @@ int op(prog *program){
 double pop(stack *tmp_pointer){
     //printf("\nIn Pop");
     double number;
+    if (tmp_pointer->pointer == NULL){
+        return FALSE;
+    }
     number = tmp_pointer->pointer->number;
     tmp_pointer->pointer = tmp_pointer->pointer->previous;
     return number;
@@ -289,7 +310,7 @@ void push(stack *tmp_polish, double number){
     tmp_polish->pointer = new;
 }
 
-int add(prog *program){
+int add(Prog *program){
     //printf("\nIn Add");
     double one, two, result;
     one = pop(program->polish);
@@ -301,7 +322,7 @@ int add(prog *program){
     
 }
 
-int subtract(prog *program){
+int subtract(Prog *program){
     double one, two, result;
     one = pop(program->polish);
     two = pop(program->polish);
@@ -311,20 +332,19 @@ int subtract(prog *program){
     return TRUE;  
 }
 
-int multiply(prog *program){
+int multiply(Prog *program){
     double one, two, result;
     one = pop(program->polish);
     two = pop(program->polish);
-    printf("\nOne = %lf", one);
-    printf("\nTwo = %lf", two);
+    
    
     result = one * two; 
-     printf("\nMultiplied result = %lf", result);
+    
     push(program->polish, result);
     return TRUE;  
 }
 
-int divide(prog *program){
+int divide(Prog *program){
     double one, two, result;
     one = pop(program->polish);
     two = pop(program->polish);
@@ -334,40 +354,36 @@ int divide(prog *program){
     return TRUE;  
 }  
 
-int check_stack(prog *program){
+int check_stack(Prog *program){
     //printf("\nIn Check_stack");
     stack *tmp_stack;
-   // printf("\nBefore set stack");
+   
     tmp_stack = program->polish;
-    //printf("\nAfter set stack");
+    
     if(tmp_stack->pointer != NULL && tmp_stack->pointer->previous != NULL){
         return TRUE;
     }
     return FALSE; 
 }
 
-int fd(prog *program){
+int fd(Prog *program){
     int length, variable_index;
-    /*printf("\nIn FD");
-    for(int i = 0; i < LETTERS; i++){
-        printf("\nLetter: %d", program->variable[i]);   
-    }*/
+    
     if(!(strings_match(program->words[program->current_word], "FD"))){
         return FALSE;
     }
     program->current_word += 1;
     
     if (varnum(program) == TRUE){
-        if (isVar(program) == TRUE){
+        if (is_var(program) == TRUE){
             variable_index = program->words[program->current_word][0] - 'A';
-            //printf("\nVariable_index = %d", variable_index);
-            //printf("\nVariable A value = %lf", program->variable[variable_index]);
+            
             length = program->variable[variable_index];
         }
         else{
             length = atoi(program->words[program->current_word]);
         }
-        //printf("\nCurrent length = %d", length);
+        
         program->current_length = length;
         assign_draw(program);
         return TRUE;
@@ -377,7 +393,7 @@ int fd(prog *program){
     }
 }
 
-int lt(prog *program){
+int lt(Prog *program){
     if(!(strings_match(program->words[program->current_word], "LT"))){
         return FALSE;
     }
@@ -392,7 +408,7 @@ int lt(prog *program){
     }
 }
 
-int rt(prog *program){
+int rt(Prog *program){
     if(!(strings_match(program->words[program->current_word], "RT"))){
         return FALSE;
     }
@@ -406,7 +422,7 @@ int rt(prog *program){
     }
 }
 
-void assign_draw(prog *program){
+void assign_draw(Prog *program){
     //printf("\nCurrent angle = %d", program->current_angle);
     program->current_angle = make_positive(program->current_angle); //incase current angle has become negative
     //printf("\nCurrent angle = %d", program->current_angle);
@@ -418,41 +434,32 @@ void assign_draw(prog *program){
     program->draw_pointer += 1;
 }
 
-void set_new_xy(prog *program){
+void set_new_xy(Prog *program){
     double tmp_angle;
     tmp_angle = DEGTORAD(program->current_angle % 90);
     if(program->current_angle >= 270){
-        //printf("\nGreater than 270");
-        //printf("\nSin of angle %lf: %lf", tmp_angle, sin(tmp_angle));
-        //printf("\nCos of angle %lf: %lf", tmp_angle, cos(tmp_angle));
+        
         program->current_x -= (cos(tmp_angle) * program->current_length);
         program->current_y -= (sin(tmp_angle) * program->current_length);
+        
     }
     else if(program->current_angle >= 180){
-        //printf("\nGreater than 180");
-        //printf("\nSin of angle %lf: %lf", tmp_angle, sin(tmp_angle));
-        //printf("\nCos of angle %lf: %lf", tmp_angle, cos(tmp_angle));
+        
         program->current_x -= (sin(tmp_angle) * program->current_length);
         program->current_y += (cos(tmp_angle) * program->current_length);
+        
     }
     else if(program->current_angle >= 90){
-        //printf("\nGreater than 90");
-        //printf("\nSin of angle %lf: %lf", tmp_angle, sin(tmp_angle));
-        //printf("\nCos of angle %lf: %lf", tmp_angle, cos(tmp_angle));
+        
         program->current_x += (cos(tmp_angle) * program->current_length);
         program->current_y += (sin(tmp_angle) * program->current_length);
+        
     }
     else{
-        //printf("\nGreater than 0");
-        //printf("\nCurrent angle: %d", program->current_angle);
-        //printf("\nCurrent x: %d", program->current_x);
-        //printf("\nCurrent y: %d", program->current_y);
-        //printf("\nSin of angle %lf: %lf", tmp_angle, sin(tmp_angle));
-        //printf("\nCos of angle %lf: %lf", tmp_angle, cos(tmp_angle));
+        
         program->current_x += (sin(tmp_angle) * program->current_length);
         program->current_y -= (cos(tmp_angle) * program->current_length);
-        //printf("\nCurrent x: %d", program->current_x);
-        //printf("\nCurrent y: %d", program->current_y);
+        
     }
 }
 
@@ -466,46 +473,47 @@ int make_positive(int angle){
     }
 }
 
-int varnum(prog *program){
-    //printf("\nIn Varnum");
-    if(isNumber(program) == TRUE){
+int varnum(Prog *program){
+    
+    if(is_number(program) == TRUE){
         return TRUE;
     }
-    else if(isVar(program) == TRUE){
+    else if(is_var(program) == TRUE){
         return TRUE;
     }
     return FALSE;
     
-    
 }
 
-int isNumber(prog *program){
-    //printf("\nIn isNumber");
+int is_number(Prog *program){
+    
     int word_length, i;
-    double number;
+    //double number;
     word_length = strlen(program->words[program->current_word]);
     if(!isdigit(program->words[program->current_word][0]) && program->words[program->current_word][0] != '-'){
+        
         return FALSE;
     }
-    
+    //NEED TO MAKE SURE YOU CAN ONLY HAVE ONE DECIMAL PLACE
     for( i = 1; i < word_length; i++){
         if(!isdigit(program->words[program->current_word][i]) && program->words[program->current_word][i] != '.'){
-            fprintf(stdout, "\nThe value %s, is not valid with operation %s. Needs to be a whole number at least 1", program->words[program->current_word], program->words[program->current_word - 1]);
+            fprintf(stdout, "\nThe value %s, is not valid with operation %s. Needs to be a whole number at least 0", program->words[program->current_word], program->words[program->current_word - 1]);
             return FALSE;
         }
     }
-    
+    /*
     number = atof(program->words[program->current_word]);
-    //printf("\nNumber = %lf", number);
+    
     if(number == 0){
         fprintf(stdout, "\nThe value %s, is not valid with operation %s. Needs to be a whole number above 1", program->words[program->current_word], program->words[program->current_word - 1]);
         return FALSE;
     }
+    */
     return TRUE;
 }
 
-int isVar(prog *program){
-    //printf("\nIn isVar");
+int is_var(Prog *program){
+    
     int word_length;
     word_length = strlen(program->words[program->current_word]);
     if(word_length != 1){
@@ -517,7 +525,7 @@ int isVar(prog *program){
     return FALSE;
 }
 
-void initialise_words_array(prog *program){
+void initialise_words_array(Prog *program){
     
     program->current_word = 0;
     program->current_x = WINDOW_WIDTH/2;;
@@ -542,7 +550,7 @@ void initialise_words_array(prog *program){
     program->draw[1] = WINDOW_HEIGHT/2;
 }
 
-FILE* check_input(prog *program, int argc, char **argv){
+FILE* check_input(Prog *program, int argc, char **argv){
     FILE *file_pointer = NULL;
     
     if(!(argc == 2)){

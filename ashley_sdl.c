@@ -1,4 +1,4 @@
-//Some functions taken from Neill_sdl.c
+//Some functions taken from Neill_sdl.c with minor changes
 
 #include "ashley_sdl.h"
 
@@ -55,7 +55,7 @@ void Neill_SDL_RenderDrawCircle(SDL_Renderer *rend, int cx, int cy, int r)
    }
 
 }
-void draw_turtle(prog *program){
+void draw_turtle(Prog *program){
     SDL_Simplewin sw;
     int i = 0;
     double startx, starty, endx, endy;
@@ -80,7 +80,7 @@ void draw_turtle(prog *program){
             // Sleep for a short time
             SDL_Delay(MILLISECONDDELAY);
 
-            // Choose a random colour, a mixture of red, green and blue.
+           
           
 
           
