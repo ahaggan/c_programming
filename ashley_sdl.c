@@ -77,7 +77,7 @@ void draw_turtle(Prog *program){
             
             endy = program->coordinate->current_y;
            
-            Neill_SDL_SetDrawColour(&sw, 255, 255, 255);
+            Neill_SDL_SetDrawColour(&sw, program->coordinate->red, program->coordinate->green, program->coordinate->blue);
             //printf("\nStart x: %lf", startx);
             //printf("\nStart y: %lf", starty);
             //printf("\nEnd x: %lf", endx);

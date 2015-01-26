@@ -74,8 +74,9 @@ int test_validate(Test *test);
 
 /*
 New tests needed:
-
-int test_run
+int test_assign_colour
+int test_set_colour
+int test_set_letter
 int test_draw_turtle
 
 int test_assign_draw

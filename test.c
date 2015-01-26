@@ -17,7 +17,7 @@ void test(void){
         print_outcome(test.results, "Check_input", "FAILED");
     }   
     
-    if (test_words_array(test.results) == PASSED){
+    if (test_words_array(&test) == PASSED){
         print_outcome(test.results, "Test_words_array", "PASSED");
     }
     else{

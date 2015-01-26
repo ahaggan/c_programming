@@ -16,7 +16,8 @@
 #define DEGTORAD(x) ((x) * M_PI/180)
 #define LETTERS 26
 #define CONDITIONS 3
-
+#define LONGEST_COLOUR 10
+#define COLOUR_CHOICE 4
 typedef struct words{
     char current[WORD_LENGTH];
     struct words *next;
@@ -26,6 +27,9 @@ typedef struct words{
 typedef struct draw{
     double current_x;
     double current_y;
+    int red;
+    int blue;
+    int green;
     struct draw *next;
     struct draw *previous;
 }draw;
@@ -45,12 +49,9 @@ typedef enum condition condition;
 typedef struct Prog{
     draw start_coordinate;
     draw *coordinate;
-    //double draw[PROGRAM_LENGTH];
-    //int draw_pointer;
     words start_word;
     words *current_word;  
-    //double current_x;
-    //double current_y;
+    char colour[LONGEST_COLOUR];
     int current_angle;
     double current_length;
     int test;
@@ -75,6 +76,8 @@ void push(stack *tmp_pointer, double number);
 
 int polish(Prog *program);
 int set(Prog *program);
+int set_letter(Prog *program);
+int set_colour(Prog *program);
 int is_var(Prog *program);
 int is_number(Prog *program);
 int parse(Prog *program);
@@ -100,6 +103,7 @@ The functions below are used to interpret the commands in the file that is being
 */
 //Adds the x and y coordinates of the next point to draw to into a draw array.
 void assign_draw(Prog *program);
+void assign_colour(Prog *program);
 void set_new_xy(Prog *program);
 //Function contained in ashley_sdl.c and uses the draw array to draw the program file on the screen in SDL
 void draw_turtle(Prog *program);

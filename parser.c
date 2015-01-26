@@ -8,9 +8,20 @@ int main(int argc, char **argv){
     
     program.file_pointer = check_input(&program, argc, argv);
     
-    if(parse(&program) == TRUE){
-        draw_turtle(&program);
+    if(program.file_pointer == NULL){
+        if(program.test == TRUE){
+            test();
+            return 0;
+        }
+        return 1;
     }
+    else{
+        if(parse(&program) == TRUE){
+            draw_turtle(&program);
+            return 0;
+        }
+    }
+    return 1;
     
 }
 
@@ -18,13 +29,6 @@ int parse(Prog *program){
     
     words *new_word;
     words *previous_word;
-    if(program->file_pointer == NULL){
-        if(program->test == TRUE){
-            test();
-            return TRUE;
-        }
-        return FALSE;
-    }
     
     program->current_word = &program->start_word;
     //printf("\nWORD: %s\n", fscanf(program->file_pointer, "%s", program->current_word->current));
@@ -216,19 +220,30 @@ int perform_loop(Prog *program){
     
 int set(Prog *program){
     //printf("\nIn Set");
-    int variable_index;
+    
     if(!(strings_match(program->current_word->current, "SET"))){
         return FALSE;
     }
     program->current_word = program->current_word->next;
     
-    if (is_var(program) == FALSE){
+    if (is_var(program) == TRUE){
+        return set_letter(program);
+    }
+    else if(strings_match(program->current_word->current, "COLOUR")){
+        return set_colour(program);    
+    }
+    else{
         fprintf(stdout, "\nOperation SET needs to be followed by a variable A - Z\n");
         return FALSE;
     }
     
+    
+}
+
+int set_letter(Prog *program){
+    int variable_index;
+    
     variable_index = program->current_word->current[0] - 'A';
-    //printf("\nVariable_index = %d", variable_index); 
     program->current_word = program->current_word->next;
     if(!(strings_match(program->current_word->current, ":="))){
         return FALSE;
@@ -242,6 +257,31 @@ int set(Prog *program){
             program->variable[variable_index] = program->result;
         return TRUE;
     }
+    return FALSE;
+}
+
+int set_colour(Prog *program){
+    char *colours[COLOUR_CHOICE] = {"RED", "BLUE", "GREEN", "WHITE"};
+    int i, found = FALSE;
+    program->current_word = program->current_word->next;
+    if(!(strings_match(program->current_word->current, ":="))){
+        return FALSE;
+    }
+    program->current_word = program->current_word->next; 
+    for(i = 0; i < COLOUR_CHOICE; i++){
+        if(strings_match(program->current_word->current, colours[i])){
+            strcpy(program->colour, colours[i]);
+            found = TRUE;
+        }
+    }
+    if(found == FALSE){
+        return FALSE;
+    }
+    program->current_word = program->current_word->next;
+    if(strings_match(program->current_word->current, ";")){
+        return TRUE;
+    }
+    fprintf(stdout, "\nSET command needs to end with ;\n");
     return FALSE;
 }
 
@@ -447,9 +487,33 @@ void assign_draw(Prog *program){
     new_coordinate->previous = program->coordinate;
     new_coordinate->current_x = program->coordinate->current_x;
     new_coordinate->current_y = program->coordinate->current_y;
+    assign_colour(program);
     program->coordinate = new_coordinate;
     set_new_xy(program);
     
+}
+
+void assign_colour(Prog *program){
+    if(strings_match(program->colour, "WHITE")){
+        program->coordinate->red = 255;
+        program->coordinate->green = 255;
+        program->coordinate->blue = 255;
+    }
+    else if(strings_match(program->colour, "RED")){
+        program->coordinate->red = 255;
+        program->coordinate->green = 0;
+        program->coordinate->blue = 0;
+    }
+    else if(strings_match(program->colour, "GREEN")){
+        program->coordinate->red = 0;
+        program->coordinate->green = 255;
+        program->coordinate->blue = 0;
+    }
+    else if(strings_match(program->colour, "BLUE")){
+        program->coordinate->red = 0;
+        program->coordinate->green = 0;
+        program->coordinate->blue = 255;
+    }
 }
 
 void set_new_xy(Prog *program){
@@ -548,6 +612,7 @@ void initialise_words_array(Prog *program){
     program->current_word = (words*)malloc(sizeof(words));
     program->start_coordinate.current_x = WINDOW_WIDTH/2;;
     program->start_coordinate.current_y = WINDOW_HEIGHT/2;
+    strcpy(program->colour, "WHITE");
     program->current_angle = 0;
     program->coordinate = &program->start_coordinate;
     program->polish = (stack*)malloc(sizeof(stack));
