@@ -1,13 +1,13 @@
 #include "parser.h"
 
 int main(int argc, char **argv){
-   	FILE *file_pointer;
+   	
     Prog program;
     
     initialise_words_array(&program);
     
-    file_pointer = check_input(&program, argc, argv);
-    program.file_pointer = file_pointer;
+    program.file_pointer = check_input(&program, argc, argv);
+    
     if(parse(&program) == TRUE){
         draw_turtle(&program);
     }
@@ -55,9 +55,7 @@ int parse(Prog *program){
 int validate(Prog *program){
     //printf("\nIn validate");
     program->current_word = &program->start_word;
-    for(int i = 0; i < LETTERS; i++){
-        //printf("\nLetter: %lf", program->variable[i]);   
-    }
+    
     if(!strings_match(program->current_word->current, "{")){
         fprintf(stdout, "\nProgram needs to start with '{'");
         return FALSE;
@@ -553,7 +551,7 @@ void initialise_words_array(Prog *program){
     program->current_angle = 0;
     program->coordinate = &program->start_coordinate;
     program->polish = (stack*)malloc(sizeof(stack));
-    program->polish->pointer = (polish_list*)malloc(sizeof(polish_list));
+    //program->polish->pointer = (polish_list*)malloc(sizeof(polish_list));
     memset(program->variable, 0, LETTERS);
    
     program->test = FALSE;

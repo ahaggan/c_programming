@@ -16,14 +16,14 @@ void test(void){
     else{
         print_outcome(test.results, "Check_input", "FAILED");
     }   
-    /*
+    
     if (test_words_array(test.results) == PASSED){
         print_outcome(test.results, "Test_words_array", "PASSED");
     }
     else{
         print_outcome(test.results, "Test_words_array", "FAILED");
     }
-    */
+    
     if(test_validate(&test) == PASSED){
         print_outcome(test.results, "Test_validate", "PASSED");
     }
@@ -206,6 +206,13 @@ void test(void){
     else{
         print_outcome(test.results, "Test_set_new_xy", "FAILED");
     }
+
+    if(test_parse(&test) == PASSED){
+        print_outcome(test.results, "Test_parse", "PASSED");
+    }
+    else{
+        print_outcome(test.results, "Test_parse", "FAILED");
+    }
    
 }
 
@@ -249,8 +256,20 @@ void tester(Test *test){
     
 }
 
-int is_true((int)(*test_function)(Prog), Prog test_program){
-    return test_function(test_program);
+int test_parse(Test *test){
+    Prog program;
+    initialise_test(test, &program);
+    strcpy(test->name, "parse");
+    test->function = &parse;
+
+    test->program->file_pointer = fopen("test1.txt", "r");
+    test->condition = TRUE;
+    tester(test);
+
+    if(test->pass == test->current){
+        return PASSED;
+    }
+    return NOT_PASSED;
 }
 
 int test_push(FILE *test_pointer){
@@ -285,35 +304,7 @@ int test_push(FILE *test_pointer){
 
 
 int test_set_new_xy(Test *test){
-    Prog program;
-    //int startx, starty, endx, endy;
-    initialise_test(test, &program);
-    strcpy(test->name, "set_new_xy");
     
-    //Tests an angle less than 90
-    test->current += 1;
-    test->program->current_x = 100;
-    test->program->current_y = 100;
-    test->program->current_length = 100;
-    test->program->current_angle = 30;
-    set_new_xy(test->program);
-    printf("\nCURRENT X: %d\n", (int)test->program->current_x);
-    if((int)(test->program->current_x) == 150){
-        test->program->current_y = 100;
-        test->program->current_angle = 60;
-        set_new_xy(test->program);
-        printf("\nCURRENT Y: %lf\n", test->program->current_y);
-        printf("\nCURRENT Y: %d\n", (int)test->program->current_y);
-        if((int)(test->program->current_y) == 50){ 
-            printf("\nCURRENT Y: %lf\n", test->program->current_y);
-            test->pass += 1;
-            fprintf(test->results, "\nset_new_xy test 1: Passed");
-        }
-    }
-    
-    if(test->pass == test->current){
-        return PASSED;
-    }
     return NOT_PASSED;
 }
 
@@ -693,7 +684,7 @@ int test_op(Test *test){
    
     
     //Tests addition should return TRUE
-    
+    push(test->program->polish, 10);
     push(test->program->polish, 10);
     strcpy(test->test_program[0], "+");
     write_program(test);
@@ -823,7 +814,7 @@ int test_divide(Test *test){
 int test_subtract(Test *test){
     Prog program;
     initialise_test(test, &program);
-    double answer;
+    int answer;
     
     test->current += 1;
     //Test two whole numbers
@@ -843,14 +834,15 @@ int test_subtract(Test *test){
     push(test->program->polish, 3.79);
     push(test->program->polish, 1.88);
     subtract(test->program);
-    if((answer = pop(test->program->polish)) == 1.910000){
+    answer = (int)(100 * pop(test->program->polish)); //Tests to 2 dp of accuracy
+    if(answer == 191){
         fprintf(test->results, "\nSubtract test 2: Passed");
         test->pass += 1;
     }
     else{
         fprintf(test->results, "\nSubtract test 2: Failed");
     }
-    fprintf(stdout, "\nAnswer = %lf", answer);
+    //fprintf(stdout, "\nAnswer = %lf", answer);
     
     if(test->pass == test->current){
         return PASSED;
@@ -908,16 +900,13 @@ int test_check_stack(Test *test){
     //Is there automatically a number on the stack??
     
     //Tests pushes too few numbers onto stack should return FALSE
-   
-    
-    printf("\nNumber automatically on stack: %lf\n", pop(test->program->polish));
+    push(test->program->polish, 20);
     test->condition = FALSE;
     tester(test);
     
     //Tests pushes another number onto stack(so should be the amount needed) should return TRUE
     test->program->current_word = 0;
-     
-    push(test->program->polish, 20);
+    push(test->program->polish, 10);
     test->condition = TRUE;
     tester(test);
     
@@ -1065,36 +1054,34 @@ int test_get_parameter(Test *test){
 }
 
 int test_varnum(Test *test){
-    //Test test;
+    /*
+    Function calls in_number and is_var functions which are tested separately so only basic testing 
+    */
     Prog program;
     initialise_test(test, &program);
     strcpy(test->name, "Varnum");
     test->function = &varnum;
     
-    
-    strcpy(test->test_program[0], "RT");
-    strcpy(test->test_program[1], "40");
+    //Passes a capital letter, should return TRUE
+    strcpy(test->test_program[0], "R");
     write_program(test);
     test->condition = TRUE;
     tester(test);
     
-
-    strcpy(test->test_program[0], "RT");
-    strcpy(test->test_program[1], "-3g");
+    //Passes a lower case letter should return FALSE
+    strcpy(test->test_program[0], "g");
     write_program(test);
     test->condition = FALSE;
     tester(test);
     
-    
+    //Passes multiple letters should return FALSE
     strcpy(test->test_program[0], "RT");
-    strcpy(test->test_program[1], "-30");
     write_program(test);
-    test->condition = TRUE;
+    test->condition = FALSE;
     tester(test);
     
-
-    strcpy(test->test_program[0], "RT");
-    strcpy(test->test_program[1], "A");
+    //Passes a number, should return TRUE
+    strcpy(test->test_program[0], "6");
     write_program(test);
     test->condition = TRUE;
     tester(test);
@@ -1396,7 +1383,7 @@ Function should return TRUE if the current word is } otherwise, should call the 
     test->condition = FALSE;
     tester(test);
     //passes a correct program end so should return TRUE
-    strcpy(test->test_program[0], "{");
+    strcpy(test->test_program[0], "}");
     strcpy(test->test_program[1], "}");
     write_program(test);
     test->condition = TRUE;
@@ -1450,26 +1437,13 @@ Tests need to check that the function only works if the program starts with a {,
 }
 
 
-void print_outcome(FILE *test_pointer, char *test, char *outcome){
-    fprintf(test_pointer, "\n\n**%s function %s!**\n\n", test, outcome);
-}
 
-/*
 int test_words_array(Test *test){
-    Prog program;
-    initialise_test(test, &program);
-    strcpy(test->name, "Validate");
-    test->function = &validate;
     
-
-    for(int i = 0; i < PROGRAM_LENGTH; i++){
-        if(test_program.words[i][0] != '\0'){
             return NOT_PASSED;
-        }
-    }
-    return PASSED;
+    
 }
-*/
+
 int test_check_input(Test *test){
 
     FILE *file_pointer;
@@ -1552,7 +1526,7 @@ int test_check_input(Test *test){
         //pass_count += 1;
     }
     
-    if(test->pass != test->current){
+    if(test->pass == test->current){
         return PASSED;
     }
     else{       //ELSE NOT NEEDED, IS IT BETTER NOT TO HAVE?

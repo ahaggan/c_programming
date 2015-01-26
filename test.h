@@ -34,7 +34,7 @@ Each function is a test for the function that is explicit in the function name
 Old tests!
 */
 int test_check_input(Test *test);
-//int test_words_array(FILE *test_pointer); //FUNCTION COMPLETELY DIFFERENT NOW, NEED TO CHANGE THIS
+int test_words_array(Test *test_test); //FUNCTION COMPLETELY DIFFERENT NOW, NEED TO CHANGE THIS
 
 
 
@@ -47,6 +47,7 @@ int test_push(FILE *test_pointer); //Not complete
 /*
 New tests!
 */
+int test_parse(Test *test);
 int test_varnum(Test *test);
 int test_loop(Test *test);
 int test_loop_condition(Test *test);

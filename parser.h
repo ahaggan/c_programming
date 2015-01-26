@@ -45,12 +45,12 @@ typedef enum condition condition;
 typedef struct Prog{
     draw start_coordinate;
     draw *coordinate;
-    double draw[PROGRAM_LENGTH];
-    int draw_pointer;
+    //double draw[PROGRAM_LENGTH];
+    //int draw_pointer;
     words start_word;
     words *current_word;  
-    double current_x;
-    double current_y;
+    //double current_x;
+    //double current_y;
     int current_angle;
     double current_length;
     int test;
