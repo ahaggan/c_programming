@@ -11,6 +11,7 @@ Testing module tests each function in the Parser. Due to the recursive nature of
 //Contains information needed for the tests
 typedef struct Test{
     Prog *program;
+    char test_program[MAX_FUNCTION_LENGTH][INSTRUCTION_LENGTH];
     int current;
     int condition;
     char name[MAX_FUNCTION_LENGTH];
@@ -24,6 +25,7 @@ Helper functions used by test function in order to test and print the results fo
 void print_outcome(FILE *test_pointer, char *test, char *outcome);
 void tester(Test *test);
 void initialise_test(Test *test, Prog *program);
+void write_program(Test *test);
 /*
 Each function is a test for the function that is explicit in the function name
 */
@@ -31,15 +33,11 @@ Each function is a test for the function that is explicit in the function name
 /*
 Old tests!
 */
-int test_check_input(FILE *test_pointer);
-int test_words_array(FILE *test_pointer);
-int test_validate(FILE *test_pointer);
-int test_instrctlst(FILE *test_pointer);
-int test_instruction(FILE *test_pointer);
+int test_check_input(Test *test);
+//int test_words_array(FILE *test_pointer); //FUNCTION COMPLETELY DIFFERENT NOW, NEED TO CHANGE THIS
 
-int test_fd(FILE *test_pointer);
-int test_lt(FILE *test_pointer);
-int test_rt(FILE *test_pointer);
+
+
 int test_make_positive(FILE *test_pointer);
 int test_assign_draw(FILE *test_pointer);
 
@@ -66,6 +64,12 @@ int test_pop(Test *test);
 int test_polish(Test *test);
 int test_set(Test *test);
 int test_set_new_xy(Test *test); //Test doesn't work
+int test_fd(Test *test);
+int test_lt(Test *test);
+int test_rt(Test *test);
+int test_instrctlst(Test *test);
+int test_instruction(Test *test);
+int test_validate(Test *test);
 
 /*
 New tests needed:

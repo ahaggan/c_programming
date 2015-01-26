@@ -8,56 +8,56 @@ void test(void){
 	//test_pointer = fopen("test_results.txt", "w");
 	test.results = fopen("test_results.txt", "w");
 	fprintf(test.results, "Below are the test results for each function:\n");
-    if (test_check_input(test.results) == PASSED){
+    if (test_check_input(&test) == PASSED){
         print_outcome(test.results, "Check_input", "PASSED");
     }
     else{
         print_outcome(test.results, "Check_input", "FAILED");
     }   
-    
+    /*
     if (test_words_array(test.results) == PASSED){
         print_outcome(test.results, "Test_words_array", "PASSED");
     }
     else{
         print_outcome(test.results, "Test_words_array", "FAILED");
     }
-    
-    if(test_validate(test.results) == PASSED){
+    */
+    if(test_validate(&test) == PASSED){
         print_outcome(test.results, "Test_validate", "PASSED");
     }
     else{
         print_outcome(test.results, "Test_validate", "FAILED");
     }
     
-    if(test_instrctlst(test.results) == PASSED){
+    if(test_instrctlst(&test) == PASSED){
         print_outcome(test.results, "Test_instrctlst", "PASSED");
     }
     else{
         print_outcome(test.results, "Test_instrctlst", "FAILED");
     }
     
-    if(test_instruction(test.results) == PASSED){
+    if(test_instruction(&test) == PASSED){
         print_outcome(test.results, "Test_instruction", "PASSED");
     }
     else{
         print_outcome(test.results, "Test_instruction", "FAILED");
     }
     
-    if(test_fd(test.results) == PASSED){
+    if(test_fd(&test) == PASSED){
         print_outcome(test.results, "Test_fd", "PASSED");
     }
     else{
         print_outcome(test.results, "Test_fd", "FAILED");
     }
     
-    if(test_lt(test.results) == PASSED){
+    if(test_lt(&test) == PASSED){
         print_outcome(test.results, "Test_lt", "PASSED");
     }
     else{
         print_outcome(test.results, "Test_lt", "FAILED");
     }
     
-    if(test_rt(test.results) == PASSED){
+    if(test_rt(&test) == PASSED){
         print_outcome(test.results, "Test_rt", "PASSED");
     }
     else{
@@ -70,14 +70,15 @@ void test(void){
     else{
         print_outcome(test.results, "Test_make_positive", "FAILED");
     }
-    
-    if(test_assign_draw(test.results) == PASSED){ //Not sure how to test this?
+    /*
+    if(test_assign_draw(&test) == PASSED){ //Not sure how to test this?
         print_outcome(test.results, "Test_assign_draw", "PASSED");
     }
     else{
         print_outcome(test.results, "Test_assign_draw", "FAILED");
     }
     
+    */
     if(test_varnum(&test) == PASSED){
         print_outcome(test.results, "Test_varnum", "PASSED");
     }
@@ -203,9 +204,48 @@ void test(void){
     else{
         print_outcome(test.results, "Test_set_new_xy", "FAILED");
     }
+   
 }
 
+void write_program(Test *test){
+    int i = 0;
+    words *new_word;
+    words *previous_word;
+    test->program->current_word = &test->program->start_word;
+    while(i < MAX_FUNCTION_LENGTH){
+        strcpy(test->program->current_word->current, test->test_program[i]);
+        new_word = (words*)malloc(sizeof(words));
+        previous_word = test->program->current_word;
+        test->program->current_word->next = new_word;
+        test->program->current_word = new_word;
+        test->program->current_word->previous = previous_word;
+        test->test_program[i][0] = '\0';
+        i++;
+    }
+    test->program->current_word = &test->program->start_word;  
+}
 
+void print_outcome(FILE *test_pointer, char *test, char *outcome){
+    fprintf(test_pointer, "\n\n**%s function %s!**\n\n", test, outcome);
+}
+
+void initialise_test(Test *test, Prog *program){
+    test->program = program;
+    initialise_words_array(test->program);
+    test->current = 0;
+    test->pass = 0;
+}
+
+void tester(Test *test){
+    test->current += 1;
+    if (test->function(test->program) == test->condition){
+        fprintf(test->results, "\n%s test %d: Passed", test->name, test->current);
+        test->pass += 1;
+        return;
+    }
+    fprintf(test->results, "\n%s test %d: Failed", test->name, test->current);
+    
+}
 
 int test_push(FILE *test_pointer){
     Prog program;
@@ -237,22 +277,6 @@ int test_push(FILE *test_pointer){
     
 }
 
-void initialise_test(Test *test, Prog *program){
-    test->program = program;
-    initialise_words_array(test->program);
-    test->current = 0;
-    test->pass = 0;
-}
-
-void tester(Test *test){
-    if (test->function(test->program) == test->condition){
-        fprintf(test->results, "\n%s test %d: Passed", test->name, test->current);
-        test->pass += 1;
-        return;
-    }
-    fprintf(test->results, "\n%s test %d: Failed", test->name, test->current);
-    
-}
 
 int test_set_new_xy(Test *test){
     Prog program;
@@ -289,47 +313,51 @@ int test_set_new_xy(Test *test){
 
 int test_loop(Test *test){
     Prog program;
+    
     initialise_test(test, &program);
     strcpy(test->name, "loop");
     test->function = &loop;
     
     //Program will return TRUE, basic loop
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "DO");
-    strcpy(test->program->words[1], "R");
-    strcpy(test->program->words[2], "FROM");
-    strcpy(test->program->words[3], "1");
-    strcpy(test->program->words[4], "TO");
-    strcpy(test->program->words[5], "2");
-    strcpy(test->program->words[6], "{");
-    strcpy(test->program->words[7], "}");
+    
+    
+    strcpy(test->test_program[0], "DO");
+    strcpy(test->test_program[1], "R");
+    strcpy(test->test_program[2], "FROM");
+    strcpy(test->test_program[3], "1");
+    strcpy(test->test_program[4], "TO");
+    strcpy(test->test_program[5], "2");
+    strcpy(test->test_program[6], "{");
+    strcpy(test->test_program[7], "}");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     
     //Program will return FALSE, no variable defined
-    test->program->current_word = 1;
-    test->current += 1;
-    strcpy(test->program->words[1], "DO");
-    strcpy(test->program->words[2], "FROM");
-    strcpy(test->program->words[3], "1");
-    strcpy(test->program->words[4], "TO");
-    strcpy(test->program->words[5], "2");
-    strcpy(test->program->words[6], "{");
-    strcpy(test->program->words[7], "}");
+    
+    
+    strcpy(test->test_program[1], "DO");
+    strcpy(test->test_program[2], "FROM");
+    strcpy(test->test_program[3], "1");
+    strcpy(test->test_program[4], "TO");
+    strcpy(test->test_program[5], "2");
+    strcpy(test->test_program[6], "{");
+    strcpy(test->test_program[7], "}");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     
     //Program will return FALSE, no opening bracket
-    test->program->current_word = 1;
-    test->current += 1;
-    strcpy(test->program->words[1], "DO");
-    strcpy(test->program->words[2], "A");
-    strcpy(test->program->words[3], "FROM");
-    strcpy(test->program->words[4], "1");
-    strcpy(test->program->words[5], "TO");
-    strcpy(test->program->words[6], "2");
-    strcpy(test->program->words[7], "}");
+    
+    
+    strcpy(test->test_program[1], "DO");
+    strcpy(test->test_program[2], "A");
+    strcpy(test->test_program[3], "FROM");
+    strcpy(test->test_program[4], "1");
+    strcpy(test->test_program[5], "TO");
+    strcpy(test->test_program[6], "2");
+    strcpy(test->test_program[7], "}");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     
@@ -346,35 +374,45 @@ int test_perform_loop(Test *test){
     test->function = &perform_loop;
     
     //Program will return TRUE, basic loop
-    test->program->current_word = 0;
-    test->current += 1;
+    
+    printf("\nBEFORE THE FIRST TEST.\n");
     test->program->loop[letter] = 'A';
     test->program->loop[start] = 1;
     test->program->loop[stop] = 2;
-    strcpy(test->program->words[1], "}");
+    printf("\nBEFORE THE FIRST STRCPY.\n");
+    strcpy(test->test_program[0], "{");//Needed for the function but not read
+    strcpy(test->test_program[1], "}");
+    printf("\nBEFORE THE WRITE_PROGRAM.\n");
+    write_program(test);
     test->condition = TRUE;
+    printf("\nBEFORE THE TESTER.\n");
     tester(test);
+    printf("\nAFTER THE TESTER.\n");
     
     //Program will return FALSE, start > end
-    test->program->current_word = 0;
-    test->current += 1;
+   
+    
     test->program->loop[letter] = 'A';
     test->program->loop[start] = 2;
     test->program->loop[stop] = 1;
-    strcpy(test->program->words[1], "}");
+    strcpy(test->test_program[0], "Arb");
+    strcpy(test->test_program[1], "}");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     
     //Program will return FALSE, basic loop with incomplete contents
-    test->program->current_word = 0;
-    test->current += 1;
+    
+    
     test->program->loop[letter] = 'A';
     test->program->loop[start] = 1;
     test->program->loop[stop] = 2;
-    strcpy(test->program->words[1], "FD");
-    strcpy(test->program->words[2], "10");
-    strcpy(test->program->words[3], "RT");
-    strcpy(test->program->words[4], "50");
+    strcpy(test->test_program[0], "{");
+    strcpy(test->test_program[1], "FD");
+    strcpy(test->test_program[2], "10");
+    strcpy(test->test_program[3], "RT");
+    strcpy(test->test_program[4], "50");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     
@@ -392,51 +430,56 @@ int test_loop_condition(Test *test){
     
     
     //Program will return TRUE, basic loop condition just numbers
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "FROM");
-    strcpy(test->program->words[1], "1");
-    strcpy(test->program->words[2], "TO");
-    strcpy(test->program->words[3], "4");
+    
+    
+    strcpy(test->test_program[0], "FROM");
+    strcpy(test->test_program[1], "1");
+    strcpy(test->test_program[2], "TO");
+    strcpy(test->test_program[3], "4");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     
     //Program will return TRUE, basic loop condition with a letter
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "FROM");
-    strcpy(test->program->words[1], "A");
-    strcpy(test->program->words[2], "TO");
-    strcpy(test->program->words[3], "4");
+    
+    
+    strcpy(test->test_program[0], "FROM");
+    strcpy(test->test_program[1], "A");
+    strcpy(test->test_program[2], "TO");
+    strcpy(test->test_program[3], "4");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     
     //Program will return TRUE, basic loop condition start = end
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "FROM");
-    strcpy(test->program->words[1], "A");
-    strcpy(test->program->words[2], "TO");
-    strcpy(test->program->words[3], "A");
+   
+    
+    strcpy(test->test_program[0], "FROM");
+    strcpy(test->test_program[1], "A");
+    strcpy(test->test_program[2], "TO");
+    strcpy(test->test_program[3], "A");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     
     //Program will return FALSE, basic loop condition without FROM
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "5");
-    strcpy(test->program->words[1], "TO");
-    strcpy(test->program->words[2], "1");
+    
+    
+    strcpy(test->test_program[0], "5");
+    strcpy(test->test_program[1], "TO");
+    strcpy(test->test_program[2], "1");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     
     //Program will return FALSE, basic loop condition without a second condition
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "FROM");
-    strcpy(test->program->words[1], "5");
-    strcpy(test->program->words[2], "TO");
-    strcpy(test->program->words[3], "");
+    
+    
+    strcpy(test->test_program[0], "FROM");
+    strcpy(test->test_program[1], "5");
+    strcpy(test->test_program[2], "TO");
+    strcpy(test->test_program[3], "");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     
@@ -454,74 +497,81 @@ int test_set(Test *test){
     
     
     //Program will return FALSE, basic expression doesn't end with a ;
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "SET");
-    strcpy(test->program->words[1], "A");
-    strcpy(test->program->words[2], ":=");
-    strcpy(test->program->words[3], "7");
+    
+    
+    strcpy(test->test_program[0], "SET");
+    strcpy(test->test_program[1], "A");
+    strcpy(test->test_program[2], ":=");
+    strcpy(test->test_program[3], "7");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     
     //Program will return FALSE, basic expression doesn't contain an equals sign
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "SET");
-    strcpy(test->program->words[1], "A");
-    strcpy(test->program->words[2], "to");
-    strcpy(test->program->words[3], "7");
-    strcpy(test->program->words[4], ";");
+    
+    
+    strcpy(test->test_program[0], "SET");
+    strcpy(test->test_program[1], "A");
+    strcpy(test->test_program[2], "to");
+    strcpy(test->test_program[3], "7");
+    strcpy(test->test_program[4], ";");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     
     //Program will return FALSE, basic expression doesn't start SET a variable
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "SET");
-    strcpy(test->program->words[1], "5");
-    strcpy(test->program->words[2], ":=");
-    strcpy(test->program->words[3], "7");
-    strcpy(test->program->words[4], ";");
+    
+    
+    strcpy(test->test_program[0], "SET");
+    strcpy(test->test_program[1], "5");
+    strcpy(test->test_program[2], ":=");
+    strcpy(test->test_program[3], "7");
+    strcpy(test->test_program[4], ";");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     
     //Program will return FALSE, basic expression doesn't start with SET
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "N");
-    strcpy(test->program->words[1], ":=");
-    strcpy(test->program->words[2], "5");
-    strcpy(test->program->words[3], ";");
+   
+    
+    strcpy(test->test_program[0], "N");
+    strcpy(test->test_program[1], ":=");
+    strcpy(test->test_program[2], "5");
+    strcpy(test->test_program[3], ";");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     
     //Program will return FALSE, basic expression doesn't start with SET
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "N");
-    strcpy(test->program->words[1], ":=");
-    strcpy(test->program->words[2], "5");
-    strcpy(test->program->words[3], ";");
+    
+    
+    strcpy(test->test_program[0], "N");
+    strcpy(test->test_program[1], ":=");
+    strcpy(test->test_program[2], "5");
+    strcpy(test->test_program[3], ";");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     //Program will return FALSE, basic SET expression without a value to set to
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "SET");
-    strcpy(test->program->words[1], "G");
-    strcpy(test->program->words[2], ":=");
-    strcpy(test->program->words[3], ";");
+    
+    
+    strcpy(test->test_program[0], "SET");
+    strcpy(test->test_program[1], "G");
+    strcpy(test->test_program[2], ":=");
+    strcpy(test->test_program[3], ";");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     
     //Program will return TRUE, basic SET expression passed
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "SET");
-    strcpy(test->program->words[1], "G");
-    strcpy(test->program->words[2], ":=");
-    strcpy(test->program->words[3], "5");
-    strcpy(test->program->words[4], ";");
+    
+    
+    strcpy(test->test_program[0], "SET");
+    strcpy(test->test_program[1], "G");
+    strcpy(test->test_program[2], ":=");
+    strcpy(test->test_program[3], "5");
+    strcpy(test->test_program[4], ";");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     
@@ -540,43 +590,48 @@ int test_polish(Test *test){
     test->function = &polish;
     
     //Program will return TRUE, basic end of Polish expression passed
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], ";");
+    
+    
+    strcpy(test->test_program[0], ";");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     
     //Program will return TRUE, basic number and end
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "7");
-    strcpy(test->program->words[1], ";");
+    
+    
+    strcpy(test->test_program[0], "7");
+    strcpy(test->test_program[1], ";");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     
     //Program will return TRUE, basic variable and end
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "V");
-    strcpy(test->program->words[1], ";");
+    
+    
+    strcpy(test->test_program[0], "V");
+    strcpy(test->test_program[1], ";");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     
     //Program will return TRUE, basic operation and end
-    test->program->current_word = 0;
-    test->current += 1;
+    
+    
     push(test->program->polish, 5);
     push(test->program->polish, 5);
-    strcpy(test->program->words[0], "+");
-    strcpy(test->program->words[1], ";");
+    strcpy(test->test_program[0], "+");
+    strcpy(test->test_program[1], ";");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     
     //Program will return FALSE, basic variable but no end
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "V");
-    strcpy(test->program->words[0], "");
+    
+    
+    strcpy(test->test_program[0], "V");
+    strcpy(test->test_program[0], "");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     
@@ -629,47 +684,53 @@ int test_op(Test *test){
     strcpy(test->name, "op");
     test->function = &op;
     //Checks that TRUE is returned when enough number on the stack and a valied operation: +, -, *, /. Function will return FALSE otherwise    
-    test->program->current_word = 0;
+   
     
     //Tests addition should return TRUE
-    test->current += 1;
+    
     push(test->program->polish, 10);
-    strcpy(test->program->words[0], "+");
+    strcpy(test->test_program[0], "+");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     
     //Tests subtraction should return TRUE
-    test->current += 1;
+    
     push(test->program->polish, 10);
-    strcpy(test->program->words[0], "-");
+    strcpy(test->test_program[0], "-");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     
     //Tests multiplication should return TRUE
-    test->current += 1;
+    
     push(test->program->polish, 10);
-    strcpy(test->program->words[0], "*");
+    strcpy(test->test_program[0], "*");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     
     //Tests division should return TRUE
-    test->current += 1;
+    ;
     push(test->program->polish, 10);
-    strcpy(test->program->words[0], "/");
+    strcpy(test->test_program[0], "/");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     
     //Tests an invalid operation should return FALSE
-    test->current += 1;
+    
     push(test->program->polish, 10);
-    strcpy(test->program->words[0], ")");
+    strcpy(test->test_program[0], ")");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     
     //Tests when the stack has too few numbers should return FALSE
     pop(test->program->polish);
-    test->current += 1;
-    strcpy(test->program->words[0], "+");
+    
+    strcpy(test->test_program[0], "+");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     
@@ -683,7 +744,7 @@ int test_multiply(Test *test){
     Prog program;
     initialise_test(test, &program);
     
-    test->program->current_word = 0;
+    
     test->current += 1;
     //Test two whole numbers
     push(test->program->polish, 10);
@@ -720,7 +781,7 @@ int test_divide(Test *test){
     Prog program;
     initialise_test(test, &program);
     
-    test->program->current_word = 0;
+    
     test->current += 1;
     //Test two whole numbers
     push(test->program->polish, 10);
@@ -757,7 +818,7 @@ int test_subtract(Test *test){
     Prog program;
     initialise_test(test, &program);
     double answer;
-    test->program->current_word = 0;
+    
     test->current += 1;
     //Test two whole numbers
     push(test->program->polish, 10);
@@ -801,7 +862,7 @@ int test_add(Test *test){
     //Other functions check that the stack only contains numbers
     //Tests push the correct numbers onto stack should push a solution onto the stack
     //Test two whole numbers
-    test->program->current_word = 0;
+    
     test->current += 1;
     push(test->program->polish, 1);
     push(test->program->polish, 1);
@@ -841,16 +902,15 @@ int test_check_stack(Test *test){
     //Is there automatically a number on the stack??
     
     //Tests pushes too few numbers onto stack should return FALSE
-    test->program->current_word = 0;
-    test->current += 1;
+   
+    
     printf("\nNumber automatically on stack: %lf\n", pop(test->program->polish));
     test->condition = FALSE;
     tester(test);
     
     //Tests pushes another number onto stack(so should be the amount needed) should return TRUE
     test->program->current_word = 0;
-    test->current += 1;
-    
+     
     push(test->program->polish, 20);
     test->condition = TRUE;
     tester(test);
@@ -869,30 +929,34 @@ int test_is_var(Test *test){
     test->function = &is_var;
     
     //Tests a single capital letter should return TRUE
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "Y");
+    
+    
+    strcpy(test->test_program[0], "Y");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     
     //Tests a single lower case letter should return FALSE
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "g");
+    
+    
+    strcpy(test->test_program[0], "g");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     
     //Tests a digit should return FALSE
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "7");
+    
+    
+    strcpy(test->test_program[0], "7");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     
     //Tests a word should return FALSE
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "YES");
+   
+    
+    strcpy(test->test_program[0], "YES");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     
@@ -908,45 +972,45 @@ int test_is_number(Test *test){
     strcpy(test->name, "is_number");
     test->function = &is_number;
     //Tests a single digit should return TRUE
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "4");
+    
+    strcpy(test->test_program[0], "4");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     //Tests multiple digits should return TRUE
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "432");
+    
+    strcpy(test->test_program[0], "432");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     //Tests negative number should return TRUE
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "-432");
+    
+    strcpy(test->test_program[0], "-432");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     //Tests a decimal number should return TRUE
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "4.32");
+    
+    strcpy(test->test_program[0], "4.32");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     //Tests a decimal number with no leading digit should return FALSE
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], ".432");
+    
+    strcpy(test->test_program[0], ".432");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     //Tests a letter should return FALSE
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "D");
+   
+    strcpy(test->test_program[0], "D");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     //Tests multiple decimal places should return FALSE
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "4.3.2");
+    
+    strcpy(test->test_program[0], "4.3.2");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     
@@ -968,23 +1032,23 @@ int test_get_parameter(Test *test){
     */
     
     //Tests a number in a string, program should return the same number as an integer 
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "6");
+    
+    strcpy(test->test_program[0], "6");
+    write_program(test);
     test->condition = 6;
     tester(test);
     
     //Tests a letter, this has not been set so should return 0. 
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "F");
+    
+    strcpy(test->test_program[0], "F");
+    write_program(test);
     test->condition = 0;
     tester(test);
     
     //Tests an invalid string so should return -1
-    test->program->current_word = 0;
-    test->current += 1;
-    strcpy(test->program->words[0], "one");
+    
+    strcpy(test->test_program[0], "one");
+    write_program(test);
     test->condition = -1;
     tester(test);
     
@@ -1002,31 +1066,30 @@ int test_varnum(Test *test){
     test->function = &varnum;
     
     
-    test->program->current_word = 1;
-    test->current += 1;
-    strcpy(test->program->words[0], "RT");
-    strcpy(test->program->words[1], "40");
+    strcpy(test->test_program[0], "RT");
+    strcpy(test->test_program[1], "40");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     
-    test->program->current_word = 1;
-    test->current += 1;
-    strcpy(test->program->words[0], "RT");
-    strcpy(test->program->words[1], "-3g");
+
+    strcpy(test->test_program[0], "RT");
+    strcpy(test->test_program[1], "-3g");
+    write_program(test);
     test->condition = FALSE;
     tester(test);
     
-    test->program->current_word = 1;
-    test->current += 1;
-    strcpy(test->program->words[0], "RT");
-    strcpy(test->program->words[1], "-30");
+    
+    strcpy(test->test_program[0], "RT");
+    strcpy(test->test_program[1], "-30");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     
-    test->program->current_word = 1;
-    test->current += 1;
-    strcpy(test->program->words[0], "RT");
-    strcpy(test->program->words[1], "A");
+
+    strcpy(test->test_program[0], "RT");
+    strcpy(test->test_program[1], "A");
+    write_program(test);
     test->condition = TRUE;
     tester(test);
     
@@ -1066,6 +1129,7 @@ int test_assign_draw(FILE *test_pointer){
 }
 
 int test_make_positive(FILE *test_pointer){
+
     int pass_count = 0, no_of_tests = 0, test_number;
     //Should always return a positive number, but not the positive version of the number given - is modded with 360 later.
     no_of_tests += 1;
@@ -1094,322 +1158,296 @@ int test_make_positive(FILE *test_pointer){
     return NOT_PASSED;
 }
 
-int test_rt(FILE *test_pointer){
+int test_rt(Test *test){
     Prog program;
-    int pass_count = 0, no_of_tests = 0;
-    initialise_words_array(&program);
+    initialise_test(test, &program);
+    strcpy(test->name, "Rt");
+    test->function = &rt;
+    
+    
     //Test should pass, is correct instruction followed by a number - the number is actually checked in a different function tested separately.
-    no_of_tests += 1;
-    strcpy(program.words[0], "RT");
-    strcpy(program.words[1], "10");
-    if(rt(&program) == TRUE){
-        fprintf(test_pointer, "\nRT test 1: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nRT test 1: Failed");
-    }
+
+    strcpy(test->test_program[0], "RT");
+    strcpy(test->test_program[1], "10");
+    write_program(test);
+    test->condition = TRUE;
+    tester(test);
+    //Test should pass, is correct instruction followed by a number - the number is actually checked in a different function tested separately.
+
+    strcpy(test->test_program[0], "RT");
+    strcpy(test->test_program[1], "-10");
+    write_program(test);
+    test->condition = TRUE;
+    tester(test);
     //test has a valid number, but incorrect instruction, test will pass if function returns FALSE
-    no_of_tests += 1;
-    strcpy(program.words[0], "LT");
-    strcpy(program.words[1], "10");
-    if(rt(&program) == FALSE){
-        fprintf(test_pointer, "\nRT test 2: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nRT test 2: Failed");
-    }
+
+    strcpy(test->test_program[0], "LT");
+    strcpy(test->test_program[1], "10");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
     //test has a valid instruction, but not a number following so test will pass if function returns FALSE.
-    no_of_tests += 1;
-    strcpy(program.words[0], "RT");
-    strcpy(program.words[1], "ten");
-    if(rt(&program) == FALSE){
-        fprintf(test_pointer, "\nRT test 3: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nRT test 3: Failed");
-    }
+
+    strcpy(test->test_program[0], "RT");
+    strcpy(test->test_program[1], "ten");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
     
-    no_of_tests += 1;
-    strcpy(program.words[0], "RT");
-    strcpy(program.words[1], "gh");
-    if(rt(&program) == FALSE){
-        fprintf(test_pointer, "\nRT test 4: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nRT test 4: Failed");
-    }
+    //test has a valid instruction, but not a number following so test will pass if function returns FALSE.
+
+    strcpy(test->test_program[0], "RT");
+    strcpy(test->test_program[1], "-ten");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
+    //test has a valid instruction, but not a number following so test will pass if function returns FALSE.
+
+    strcpy(test->test_program[0], "RT");
+    strcpy(test->test_program[1], "-4g");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
     
-    no_of_tests += 1;
-    strcpy(program.words[0], "RT");
-    strcpy(program.words[1], "-gh");
-    if(rt(&program) == FALSE){
-        fprintf(test_pointer, "\nRT test 5: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nRT test 5: Failed");
-    }
-    
-    no_of_tests += 1;
-    strcpy(program.words[0], "RT");
-    strcpy(program.words[1], "-4gh");
-    if(rt(&program) == FALSE){
-        fprintf(test_pointer, "\nRT test 6: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nRT test 6: Failed");
-    }
-    
-    no_of_tests += 1;
-    strcpy(program.words[0], "RT");
-    strcpy(program.words[1], "4gh");
-    if(rt(&program) == FALSE){
-        fprintf(test_pointer, "\nRT test 7: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nRT test 7: Failed");
-    }
-    
-    
-    
-    if(pass_count == no_of_tests){
+    if(test->pass == test->current){
         return PASSED;
     }
     return NOT_PASSED;
 }
 
-int test_lt(FILE *test_pointer){
+int test_lt(Test *test){
     Prog program;
-    int pass_count = 0, no_of_tests = 0;
-    initialise_words_array(&program);
+    initialise_test(test, &program);
+    strcpy(test->name, "Lt");
+    test->function = &lt;
+    
+    
     //Test should pass, is correct instruction followed by a number - the number is actually checked in a different function tested separately.
-    no_of_tests += 1;
-    strcpy(program.words[0], "LT");
-    strcpy(program.words[1], "10");
-    if(lt(&program) == TRUE){
-        fprintf(test_pointer, "\nLT test 1: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nLT test 1: Failed");
-    }
+
+    strcpy(test->test_program[0], "LT");
+    strcpy(test->test_program[1], "10");
+    write_program(test);
+    test->condition = TRUE;
+    tester(test);
+    //Test should pass, is correct instruction followed by a number - the number is actually checked in a different function tested separately.
+;
+    strcpy(test->test_program[0], "LT");
+    strcpy(test->test_program[1], "-10");
+    write_program(test);
+    test->condition = TRUE;
+    tester(test);
     //test has a valid number, but incorrect instruction, test will pass if function returns FALSE
-    no_of_tests += 1;
-    strcpy(program.words[0], "FD");
-    strcpy(program.words[1], "10");
-    if(lt(&program) == FALSE){
-        fprintf(test_pointer, "\nLT test 2: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nLT test 2: Failed");
-    }
-    //test has a valid instruction, but not a number following so test will pass if function returns false.
-    no_of_tests += 1;
-    strcpy(program.words[0], "LT");
-    strcpy(program.words[1], "ten");
-    if(lt(&program) == FALSE){
-        fprintf(test_pointer, "\nLT test 3: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nLT test 3: Failed");
-    }
-    if(pass_count == no_of_tests){
+
+    strcpy(test->test_program[0], "RT");
+    strcpy(test->test_program[1], "10");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
+    //test has a valid instruction, but not a number following so test will pass if function returns FALSE.
+
+    strcpy(test->test_program[0], "LT");
+    strcpy(test->test_program[1], "ten");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
+    
+    //test has a valid instruction, but not a number following so test will pass if function returns FALSE.
+
+    strcpy(test->test_program[0], "LT");
+    strcpy(test->test_program[1], "-ten");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
+    //test has a valid instruction, but not a number following so test will pass if function returns FALSE.
+
+    strcpy(test->test_program[0], "LT");
+    strcpy(test->test_program[1], "-4g");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
+    
+    if(test->pass == test->current){
         return PASSED;
     }
     return NOT_PASSED;
 }
 
-int test_fd(FILE *test_pointer){
+int test_fd(Test *test){
     Prog program;
-    int pass_count = 0, no_of_tests = 0;
-    initialise_words_array(&program);
+    initialise_test(test, &program);
+    strcpy(test->name, "Fd");
+    test->function = &fd;
+    
+    
     //Test should pass, is correct instruction followed by a number - the number is actually checked in a different function tested separately.
-    no_of_tests += 1;
-    strcpy(program.words[0], "FD");
-    strcpy(program.words[1], "10");
-    if(fd(&program) == TRUE){
-        fprintf(test_pointer, "\nFD test 1: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nFD test 1: Failed");
-    }
+
+    strcpy(test->test_program[0], "FD");
+    strcpy(test->test_program[1], "10");
+    write_program(test);
+    test->condition = TRUE;
+    tester(test);
+    //Test should pass, is correct instruction followed by a number - the number is actually checked in a different function tested separately.
+
+    strcpy(test->test_program[0], "FD");
+    strcpy(test->test_program[1], "-10");
+    write_program(test);
+    test->condition = TRUE;
+    tester(test);
     //test has a valid number, but incorrect instruction, test will pass if function returns FALSE
-    no_of_tests += 1;
-    strcpy(program.words[0], "FT");
-    strcpy(program.words[1], "10");
-    if(fd(&program) == FALSE){
-        fprintf(test_pointer, "\nFD test 2: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nFD test 2: Failed");
-    }
-    //test has a valid instruction, but not a number following so test will pass if function returns false.
-    no_of_tests += 1;
-    strcpy(program.words[0], "FD");
-    strcpy(program.words[1], "ten");
-    if(fd(&program) == FALSE){
-        fprintf(test_pointer, "\nFD test 3: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nFD test 3: Failed");
-    }
-    if(pass_count == no_of_tests){
+
+    strcpy(test->test_program[0], "RT");
+    strcpy(test->test_program[1], "10");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
+    //test has a valid instruction, but not a number following so test will pass if function returns FALSE.
+
+    strcpy(test->test_program[0], "FD");
+    strcpy(test->test_program[1], "ten");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
+    
+    //test has a valid instruction, but not a number following so test will pass if function returns FALSE.
+
+    strcpy(test->test_program[0], "FD");
+    strcpy(test->test_program[1], "-ten");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
+    //test has a valid instruction, but not a number following so test will pass if function returns FALSE.
+
+    strcpy(test->test_program[0], "FD");
+    strcpy(test->test_program[1], "-4g");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
+    
+    if(test->pass == test->current){
         return PASSED;
     }
     return NOT_PASSED;
 }
 
 
-int test_instruction(FILE *test_pointer){
+int test_instruction(Test *test){
 /*Function will call FD, LT and RT in turn*/
     Prog program;
-    int pass_count = 0, no_of_tests = 0;
-    initialise_words_array(&program);
-    //passing FD to function which should be correct, test should pass if TRUE is returned.
-    no_of_tests += 1;
-    strcpy(program.words[0], "FD");
-    strcpy(program.words[1], "10");
-    if (instruction(&program) == TRUE){
-        fprintf(test_pointer, "\nInstruction test 1: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nInstruction test 1: Failed");
-    }
+    initialise_test(test, &program);
+    strcpy(test->name, "Instruction");
+    test->function = &instruction;
     
+    
+    ///passing FD to function which should be correct, test should pass if TRUE is returned.
+
+    strcpy(test->test_program[0], "FD");
+    strcpy(test->test_program[1], "10");
+    write_program(test);
+    test->condition = TRUE;
+    tester(test);
     //passing LT to function which should be correct, test should pass if TRUE is returned.
-    no_of_tests += 1;
-    program.current_word = 0;
-    strcpy(program.words[0], "LT");
-    strcpy(program.words[1], "10");
-    if (instruction(&program) == TRUE){
-        fprintf(test_pointer, "\nInstruction test 2: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nInstruction test 2: Failed");
-    }
-    
-    //passing RT to function which should be correct, test should pass if TRUE is returned.
-    no_of_tests += 1;
-    program.current_word = 0;
-    strcpy(program.words[0], "RT");
-    strcpy(program.words[1], "10");
-    if (instruction(&program) == TRUE){
-        fprintf(test_pointer, "\nInstruction test 3: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nInstruction test 3: Failed");
-    }
-    
+
+    strcpy(test->test_program[0], "LT");
+    strcpy(test->test_program[1], "10");
+    write_program(test);
+    test->condition = TRUE;
+    tester(test);
+    //passing LT to function which should be correct, test should pass if TRUE is returned.
+
+    strcpy(test->test_program[0], "RT");
+    strcpy(test->test_program[1], "10");
+    write_program(test);
+    test->condition = TRUE;
+    tester(test);
     //passing an incorrect word to function which should not be correct, test should pass if FALSE is returned.
-    no_of_tests += 1;
-    program.current_word = 0;
-    strcpy(program.words[0], "something");
-    strcpy(program.words[1], "10");
-    if (instruction(&program) == FALSE){
-        fprintf(test_pointer, "\nInstruction test 4: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nInstrctlst test 4: Failed");
-    }
+
+    strcpy(test->test_program[0], "something");
+    strcpy(test->test_program[1], "10");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
     
-    if(pass_count == no_of_tests){
+    if(test->pass == test->current){
         return PASSED;
     }
     return NOT_PASSED;
+    
 }
 
-int test_instrctlst(FILE *test_pointer){
-/*Function should return TRUE if the current word is } otherwise, should call the instruction followed by itself.*/
+int test_instrctlst(Test *test){
+/*
+Function should return TRUE if the current word is } otherwise, should call the instruction followed by itself, would call other functions in larger programs, but these are tested separately.
+*/
     Prog program;
-    int pass_count = 0, no_of_tests = 0;
-    initialise_words_array(&program);
+    initialise_test(test, &program);
+    strcpy(test->name, "Instrctlst");
+    test->function = &instrctlst;
     
-    //passes an incorrect word to instrctlst, this should be passes along and eventually return FALSE.
-    no_of_tests += 1;
-    strcpy(program.words[0], "Hello");
-    if (instrctlst(&program) == FALSE){
-        fprintf(test_pointer, "\nInstrctlst test 1: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nInstrctlst test 1: Failed");
-    }
     
+    //passes an incorrect word to instrctlst, this should be passed along and eventually return FALSE.
+    strcpy(test->test_program[0], "Hello");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
     //passes a correct program end so should return TRUE
-    no_of_tests += 1;
-    strcpy(program.words[0], "{");
-    strcpy(program.words[1], "}");
-    if (instrctlst(&program) == TRUE){
-        fprintf(test_pointer, "\nInstrctlst test 2: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nInstrctlst test 2: Failed");
-    }
+    strcpy(test->test_program[0], "{");
+    strcpy(test->test_program[1], "}");
+    write_program(test);
+    test->condition = TRUE;
+    tester(test);
+    //passes an incorrect ending program to instrctlst, this should be passed along and eventually return FALSE.
+    strcpy(test->test_program[0], "{");
+    strcpy(test->test_program[0], "end");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
     
-    if(pass_count == no_of_tests){
+    
+    if(test->pass == test->current){
         return PASSED;
     }
     return NOT_PASSED;
 }
 
-int test_validate(FILE *test_pointer){
-/*Tests need to check that the function only works if the program
-starts with a {, all other checks are done in other functions.*/ 
+int test_validate(Test *test){
+/*
+Tests need to check that the function only works if the program starts with a {, all other checks(including correct end) are done in other functions.
+*/ 
+
     Prog program;
-    int pass_count = 0, no_of_tests = 0;
-    initialise_words_array(&program);
+    initialise_test(test, &program);
+    strcpy(test->name, "Validate");
+    test->function = &validate;
+    
+    
     //Function is given an incorrect starting word, will pass if FALSE is returned
-    no_of_tests += 1;
-    strcpy(program.words[0], "Hello");
-    if (validate(&program) == FALSE){
-        fprintf(test_pointer, "\nValidate test 1: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nValidate test 1: Failed");
-    }
+    strcpy(test->test_program[0], "Hello");
+    strcpy(test->test_program[1], "{");
+    strcpy(test->test_program[2], "}");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
     
     //function is given the most basic starting program, will pass if TRUE is returned, this is sort of testing the next function as well.
-    no_of_tests += 1;
-    strcpy(program.words[0], "{");
-    strcpy(program.words[1], "}");
-    if (validate(&program) == FALSE){
-        fprintf(test_pointer, "\nValidate test 2: Failed");
-    }
-    else{
-        fprintf(test_pointer, "\nValidate test 2: Passed");
-        pass_count += 1;
-    }
+    strcpy(test->test_program[0], "{");
+    strcpy(test->test_program[1], "}");
+    write_program(test);
+    test->condition = TRUE;
+    tester(test);
     
-    if(pass_count == no_of_tests){
+    
+    if(test->pass == test->current){
         return PASSED;
     }
     return NOT_PASSED;
 }
-
-void print_outcome(FILE *test_pointer, char *test, char *outcome){
-    fprintf(test_pointer, "\n\n**%s function %s!**\n\n", test, outcome);
-}
-
-int test_words_array(FILE *test_pointer){
-    Prog test_program;
-    initialise_words_array(&test_program);
+/*
+int test_words_array(Test *test){
+    Prog program;
+    initialise_test(test, &program);
+    strcpy(test->name, "Validate");
+    test->function = &validate;
+    
     for(int i = 0; i < PROGRAM_LENGTH; i++){
         if(test_program.words[i][0] != '\0'){
             return NOT_PASSED;
@@ -1417,87 +1455,92 @@ int test_words_array(FILE *test_pointer){
     }
     return PASSED;
 }
-
-int test_check_input(FILE *test_pointer){
+*/
+int test_check_input(Test *test){
     FILE *file_pointer;
-    Prog test_program;
-    int pass_count = 0, no_of_tests = 0;
-    int argc = 2; //argc values that would be read from command line, will be changed to test for different inputs
+    Prog program;
     char **test_array;
+    initialise_test(test, &program);
     test_array = (char**)malloc(NO_INSTRUCTIONS * sizeof(char*));
-    test_array[0] = (char*)malloc(INSTRUCTION_LENGTH * sizeof(char*));
+    test_array[0] = (char*)malloc(INSTRUCTION_LENGTH * sizeof(char));
+    int argc = 2; //argc values that would be read from command line, will be changed to test for different inputs
+    
     //Test for correct number of inputs and file name, test will pass if function doesn't return NULL
-    no_of_tests += 1;
+    test->current += 1;
     test_array[0] = "prog_name";
     test_array[1] = "program.txt";
-    file_pointer = check_input(&test_program, argc, test_array);
+
+    file_pointer = check_input(test->program, argc, test_array);
     if(file_pointer == NULL){
-        fprintf(test_pointer, "\nInput test 1: Failed");  
+        fprintf(test->results, "\nInput test 1: Failed");  
     }
     else{
-        fprintf(test_pointer, "\nInput test 1: Passed");
-        pass_count += 1;
+        fprintf(test->results, "\nInput test 1: Passed");
+        test->pass += 1;
     }
     //Test for incorrect file name, test will pass if NULL is returned
-    no_of_tests += 1;
+    test->current += 1;
     test_array[0] = "prog_name";
-    test_array[1] = "progrm.txt"; //Incorrect file name
-    file_pointer = check_input(&test_program, argc, test_array);
+    test_array[1] = "progrm.txt";//Incorrect file name
+     
+   file_pointer = check_input(test->program, argc, test_array);
     if(file_pointer == NULL){
-        fprintf(test_pointer, "\nInput test 2: Passed");  
-        pass_count += 1;
+        fprintf(test->results, "\nInput test 2: Passed");  
+        test->pass += 1;
     }
     else{
-        fprintf(test_pointer, "\nInput test 2: Failed");
+        fprintf(test->results, "\nInput test 2: Failed");
         //pass_count += 1;
     }
     //Supply's an incorrect 3rd input, test should pass if check_input returns NULL
-    no_of_tests += 1;
+    test->current += 1;
     argc = 3;
     test_array[0] = "prog_name";
     test_array[1] = "program.txt";
-    test_array[2] = "hello"; 
-    file_pointer = check_input(&test_program, argc, test_array);
+    test_array[2] = "hello";
+    
+    file_pointer = check_input(test->program, argc, test_array);
     if(file_pointer == NULL){
-        fprintf(test_pointer, "\nInput test 3: Passed");  
-        pass_count += 1;
+        fprintf(test->results, "\nInput test 3: Passed");  
+        test->pass += 1;
     }
     else{
-        fprintf(test_pointer, "\nInput test 3: Failed");
+        fprintf(test->results, "\nInput test 3: Failed");
         //pass_count += 1;
     }
     
     //Test for input 'test', test will pass if function returns NULL and sets test element of program to TRUE.
-    no_of_tests += 1;
+    test->current += 1;
     argc = 2;
     test_array[0] = "prog_name";
     test_array[1] = "test";
-    file_pointer = check_input(&test_program, argc, test_array);
-    if(file_pointer == NULL && test_program.test == TRUE){
-        fprintf(test_pointer, "\nInput test 4: Passed");  
-        pass_count += 1;
+    
+    file_pointer = check_input(test->program, argc, test_array);
+    if(file_pointer == NULL && test->program->test == TRUE){
+        fprintf(test->results, "\nInput test 4: Passed");  
+        test->pass += 1;
     }
     else{
-        fprintf(test_pointer, "\nInput test 4: Failed");
+        fprintf(test->results, "\nInput test 4: Failed");
     }
     //Tests for too few inputs, will pass if check_input returns NULL
-    no_of_tests += 1;
+    test->current += 1;
     argc = 1;
     test_array[0] = "prog_name";
-    file_pointer = check_input(&test_program, argc, test_array);
+    file_pointer = check_input(test->program, argc, test_array);
     if(file_pointer == NULL){
-        fprintf(test_pointer, "\nInput test 5: Passed");  
-        pass_count += 1;
+        fprintf(test->results, "\nInput test 5: Passed");  
+        test->pass += 1;
     }
     else{
-        fprintf(test_pointer, "\nInput test 5: Failed");
+        fprintf(test->results, "\nInput test 5: Failed");
         //pass_count += 1;
     }
     
-    if(pass_count != no_of_tests){
-        return NOT_PASSED;
+    if(test->pass != test->current){
+        return PASSED;
     }
     else{       //ELSE NOT NEEDED, IS IT BETTER NOT TO HAVE?
-        return PASSED;
+        return NOT_PASSED;
     }
 }

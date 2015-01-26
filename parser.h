@@ -17,6 +17,19 @@
 #define LETTERS 26
 #define CONDITIONS 3
 
+typedef struct words{
+    char current[WORD_LENGTH];
+    struct words *next;
+    struct words *previous;
+}words;
+
+typedef struct draw{
+    double current_x;
+    double current_y;
+    struct draw *next;
+    struct draw *previous;
+}draw;
+
 typedef struct polish_list{
     double number;
     struct polish_list *previous;
@@ -30,10 +43,12 @@ enum condition{letter, start, stop};
 typedef enum condition condition;
 
 typedef struct Prog{
-    char words[PROGRAM_LENGTH][WORD_LENGTH];
+    draw start_coordinate;
+    draw *coordinate;
     double draw[PROGRAM_LENGTH];
     int draw_pointer;
-    int current_word;  
+    words start_word;
+    words *current_word;  
     double current_x;
     double current_y;
     int current_angle;
