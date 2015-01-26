@@ -1,5 +1,5 @@
 #include "parser.h"
-#define MILLISECONDDELAY 10
+#define MILLISECONDDELAY 50
 #define SDL_8BITCOLOUR 256
 
 typedef struct SDL_Simplewin {

@@ -1,4 +1,7 @@
+
 //Some functions taken from Neill_sdl.c, these have Neill in the function name
+
+
 
 #include "ashley_sdl.h"
 
@@ -55,22 +58,25 @@ void Neill_SDL_RenderDrawCircle(SDL_Renderer *rend, int cx, int cy, int r)
    }
 
 }
-void draw_turtle(prog *program){
+void draw_turtle(Prog *program){
     SDL_Simplewin sw;
-    int i = 0;
+    
     double startx, starty, endx, endy;
     Neill_SDL_Init(&sw);
+    program->coordinate = &program->start_coordinate;
     do{
         //Checks the program still contains instruction to draw, otherwise the loop waits for the user to stop it.
-        if(program->draw[i+3] != -1){ 
-            startx = program->draw[i];
-            i++;
-            starty = program->draw[i];
-            i++;
-            endx = program->draw[i];
-            i++;
-            endy = program->draw[i];
-            i--;
+        
+        if(program->coordinate->next != NULL){ 
+            startx = program->coordinate->current_x;
+            
+            starty = program->coordinate->current_y;
+            
+            program->coordinate = program->coordinate->next;
+            endx = program->coordinate->current_x;
+            
+            endy = program->coordinate->current_y;
+           
             Neill_SDL_SetDrawColour(&sw, 255, 255, 255);
             //printf("\nStart x: %lf", startx);
             //printf("\nStart y: %lf", starty);
@@ -80,7 +86,7 @@ void draw_turtle(prog *program){
             // Sleep for a short time
             SDL_Delay(MILLISECONDDELAY);
 
-            // Choose a random colour, a mixture of red, green and blue.
+           
           
 
           
