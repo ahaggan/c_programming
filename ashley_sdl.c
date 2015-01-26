@@ -69,15 +69,16 @@ void draw_turtle(Prog *program){
         
         if(program->coordinate->next != NULL){ 
             startx = program->coordinate->current_x;
-            
             starty = program->coordinate->current_y;
             
-            program->coordinate = program->coordinate->next;
-            endx = program->coordinate->current_x;
+            Neill_SDL_SetDrawColour(&sw, program->coordinate->red, program->coordinate->green, program->coordinate->blue);
             
+            program->coordinate = program->coordinate->next;
+            
+            endx = program->coordinate->current_x;
             endy = program->coordinate->current_y;
            
-            Neill_SDL_SetDrawColour(&sw, program->coordinate->red, program->coordinate->green, program->coordinate->blue);
+            
             //printf("\nStart x: %lf", startx);
             //printf("\nStart y: %lf", starty);
             //printf("\nEnd x: %lf", endx);

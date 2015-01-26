@@ -18,6 +18,8 @@
 #define CONDITIONS 3
 #define LONGEST_COLOUR 10
 #define COLOUR_CHOICE 4
+#define CONDITION_LENGTH 10
+
 typedef struct words{
     char current[WORD_LENGTH];
     struct words *next;
@@ -52,9 +54,13 @@ typedef struct Prog{
     words start_word;
     words *current_word;  
     char colour[LONGEST_COLOUR];
+    //char condition[CONDITION_LENGTH];
+    //char condition_colour[LONGEST_COLOUR];
+    //int condition_number;
     int current_angle;
     double current_length;
     int test;
+    int assign;
     FILE *file_pointer;
     double variable[LETTERS];
     double result;
@@ -98,6 +104,10 @@ int get_parameter(Prog *program);
 int loop_condition(Prog *program);
 int perform_loop(Prog *program);
 int varnum(Prog *program);
+
+int if_condition(Prog *program);
+int if_letter(Prog *program);
+int if_colour(Prog *program);
 /*
 The functions below are used to interpret the commands in the file that is being parsed
 */

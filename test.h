@@ -74,6 +74,10 @@ int test_validate(Test *test);
 
 /*
 New tests needed:
+
+int test_if_condition
+int test_if_letter
+int test_if_colour
 int test_assign_colour
 int test_set_colour
 int test_set_letter

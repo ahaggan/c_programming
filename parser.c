@@ -113,7 +113,10 @@ int instruction(Prog *program){
         return TRUE;
     }
     
-    
+    if(if_condition(program) == TRUE){
+        return TRUE;
+    }
+        
     if(program->current_word == NULL){
         fprintf(stdout, "\nProgram needs to end with '}'.");
     }
@@ -217,6 +220,94 @@ int perform_loop(Prog *program){
     return TRUE;
 }
 
+int if_condition(Prog *program){
+    if(!(strings_match(program->current_word->current, "IF"))){
+        return FALSE;
+    }
+    program->current_word = program->current_word->next;
+    
+    if (is_var(program) == TRUE){
+        return if_letter(program);
+    }
+    else if(strings_match(program->current_word->current, "COLOUR")){
+        return if_colour(program);    
+    }
+    else{
+        fprintf(stdout, "\nOperation IF needs to be followed by a variable A - Z\n");
+        return FALSE;
+    }
+}
+
+int if_letter(Prog *program){
+    int variable_index_check, variable_index_result;
+    double result;
+    variable_index_check = program->current_word->current[0] - 'A';
+    program->current_word = program->current_word->next;
+    if(!(strings_match(program->current_word->current, ":="))){
+        return FALSE;
+    }
+    program->current_word = program->current_word->next; 
+    if(varnum(program) == TRUE){ 
+        if(is_var(program) == TRUE){
+            variable_index_result = program->current_word->current[0] - 'A';
+            result = program->variable[variable_index_result];
+        }
+        else{
+            result = atof(program->current_word->current);
+        }
+    }
+    else{
+        fprintf(stdout, "\nAn IF statement needs to check a variable against another variable or a number.\n");
+        return FALSE;
+    }
+    if(program->variable[variable_index_check] != result){
+        fprintf(stdout, "\nIf statement failed\n");
+        program->assign = FALSE;
+    }
+    
+    program->current_word = program->current_word->next;
+    if(!(strings_match(program->current_word->current, "{"))){
+        fprintf(stdout, "\nAn IF statement needs to end with a {\n");
+        return FALSE;
+    }
+    program->current_word = program->current_word->next;
+    if (instrctlst(program) == FALSE){
+        return FALSE;
+    }
+    program->assign = TRUE;
+    
+    return TRUE; //Parses correctly if the if condition is not met
+}
+
+int if_colour(Prog *program){
+    char colour[LONGEST_COLOUR];
+    program->current_word = program->current_word->next;
+    if(!(strings_match(program->current_word->current, ":="))){
+        return FALSE;
+    }
+    program->current_word = program->current_word->next; 
+    if(strlen(program->current_word->current) > LONGEST_COLOUR){
+        fprintf(stdout, "\n%s is not a valid colour.\n", program->current_word->current);
+        return FALSE;
+    }
+    printf("\nColour in IF statement %s\n", program->current_word->current);
+    strcpy(colour, program->current_word->current);
+    
+    program->current_word = program->current_word->next;
+    if(!strings_match(program->current_word->current, "{")){
+        fprintf(stdout, "\nIF comparison needs to end with {\n");
+        return FALSE;
+    }
+    if(!strings_match(colour, program->colour)){
+        program->assign = FALSE;
+    }
+    program->current_word = program->current_word->next;
+    if (instrctlst(program) == FALSE){
+        return FALSE;
+    }
+    program->assign = TRUE;
+    return TRUE; //Parses correctly if the if condition is not met
+}
     
 int set(Prog *program){
     //printf("\nIn Set");
@@ -254,7 +345,9 @@ int set_letter(Prog *program){
             fprintf(stdout, "\nNeed to enter a nuber of variable to SET a value to.\n");
             return FALSE;
         }
+        if(program->assign == TRUE){
             program->variable[variable_index] = program->result;
+        }
         return TRUE;
     }
     return FALSE;
@@ -270,11 +363,15 @@ int set_colour(Prog *program){
     program->current_word = program->current_word->next; 
     for(i = 0; i < COLOUR_CHOICE; i++){
         if(strings_match(program->current_word->current, colours[i])){
-            strcpy(program->colour, colours[i]);
+            printf("\nassign value is %d.\n", program->assign);
+            if(program->assign == TRUE){
+                strcpy(program->colour, colours[i]);
+            }
             found = TRUE;
         }
     }
     if(found == FALSE){
+        fprintf(stdout, "\nThe colour you entered is not valid.\n");
         return FALSE;
     }
     program->current_word = program->current_word->next;
@@ -479,17 +576,20 @@ int rt(Prog *program){
 
 void assign_draw(Prog *program){
     //printf("\nCurrent angle = %d", program->current_angle);
-    draw *new_coordinate;
-    new_coordinate = (draw*)malloc(sizeof(draw));
-    program->current_angle = make_positive(program->current_angle); //incase current angle has become negative
-    //printf("\nCurrent angle = %d", program->current_angle);
-    program->coordinate->next = new_coordinate;
-    new_coordinate->previous = program->coordinate;
-    new_coordinate->current_x = program->coordinate->current_x;
-    new_coordinate->current_y = program->coordinate->current_y;
-    assign_colour(program);
-    program->coordinate = new_coordinate;
-    set_new_xy(program);
+    if(program->assign == TRUE){
+    
+        draw *new_coordinate;
+        new_coordinate = (draw*)malloc(sizeof(draw));
+        program->current_angle = make_positive(program->current_angle); //incase current angle has become negative
+        //printf("\nCurrent angle = %d", program->current_angle);
+        program->coordinate->next = new_coordinate;
+        new_coordinate->previous = program->coordinate;
+        new_coordinate->current_x = program->coordinate->current_x;
+        new_coordinate->current_y = program->coordinate->current_y;
+        assign_colour(program);
+        program->coordinate = new_coordinate;
+        set_new_xy(program);
+    }
     
 }
 
@@ -608,16 +708,20 @@ int is_var(Prog *program){
 }
 
 void initialise_words_array(Prog *program){
-    
+    int i;
     program->current_word = (words*)malloc(sizeof(words));
-    program->start_coordinate.current_x = WINDOW_WIDTH/2;;
+    program->start_coordinate.current_x = WINDOW_WIDTH/2;
     program->start_coordinate.current_y = WINDOW_HEIGHT/2;
+    
+    program->assign = TRUE;
     strcpy(program->colour, "WHITE");
     program->current_angle = 0;
     program->coordinate = &program->start_coordinate;
     program->polish = (stack*)malloc(sizeof(stack));
     //program->polish->pointer = (polish_list*)malloc(sizeof(polish_list));
-    memset(program->variable, 0, LETTERS);
+    for(i = 0; i < LETTERS; i++){
+        program->variable[i] = 0;
+    }
    
     program->test = FALSE;
    
