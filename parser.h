@@ -111,24 +111,56 @@ void initialise_program(Prog *program);
 /*
 These functions are called recursively to form the parser
 */
+//Checks for an opening brace then calls instrctlst to check the rest
 int validate(Prog *program);
-int loop(Prog *program);
+//Checks either for an ending brace or a valid instruction
+int instrctlst(Prog *program);
+//Checks for a valid instruction given in formal grammer, if the program doesn't have a correct ending displays error message
+int instruction(Prog *program);
 
 int polish(Prog *program);
-int get_parameter(Prog *program);
-int loop_condition(Prog *program);
-int perform_loop(Prog *program);
+
 int varnum(Prog *program);
-int if_condition(Prog *program);
-int instrctlst(Prog *program);
-int instruction(Prog *program);
-int fd(Prog *program);
-int lt(Prog *program);
-int rt(Prog *program);
+
+
+
+
 
 /*
 Functions used in parsing, they are called by other functions, but are not recursive
 */
+//function assigns a current length value to the program struct the calls assign_draw to add this new coordinate to the draw linked list
+int fd(Prog *program);
+//functions update the current angle value to the program struct adds for right turn and subtracts for left.
+int lt(Prog *program);
+int rt(Prog *program);
+
+//Function checks for "SET" instruction, if present determines whether user is setting a letter, the colour or an incorrect program
+int set(Prog *program);
+//Called if a user wants to set a letter, assigns the value to the program's variable array. Returns FALSE if input in incorrect.
+int set_letter(Prog *program);
+//Called if user is setting the colour and updates the colour element of the program. Returns FALSE if input in incorrect.
+int set_colour(Prog *program);
+
+//Function checks for "DO" instruction followed by a valid letter, it then checks if the loop condition valid then calls a function to perform the loop.
+int loop(Prog *program);
+//checks a valid "FROM A TO B" condition, A and B could be any allowed number or variable
+int loop_condition(Prog *program);
+//Checks that the loop goes from a lower to higher value then runs the DO program for the required iterations.
+int perform_loop(Prog *program);
+//Function returns the integer values of the current variable or number, returns -1 if FALSE to allow for an input of 0 in the loop
+int get_parameter(Prog *program);
+
+//Function checks for "IF" instruction followed by a valid letter or colour, it then calls the relevant letter or colour function which will check the condition
+int if_condition(Prog *program);
+/*
+Functions will return TRUE if the grammer is correct, the functions will set an assign flag to off if the if condition is not met. This will mean that the program in the if statement will be read, but wont set of assign any values to be drawn by the interpreter.
+*/ 
+int if_letter(Prog *program);
+int if_colour(Prog *program);
+
+
+
 int multiply(Prog *program);
 int divide(Prog *program);
 int subtract(Prog *program);
@@ -136,14 +168,12 @@ int add(Prog *program);
 int check_stack(Prog *program);
 double pop(stack *pointer);
 void push(stack *tmp_pointer, double number);
-int set(Prog *program);
-int set_letter(Prog *program);
-int set_colour(Prog *program);
+
+
 int is_var(Prog *program);
 int is_number(Prog *program);
 
-int if_letter(Prog *program);
-int if_colour(Prog *program);
+
 int op(Prog *program);
 int make_positive(int angle);
 

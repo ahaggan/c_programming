@@ -70,8 +70,7 @@ int parse(Prog *program){
 }
 
 int validate(Prog *program){
-    //printf("\nIn validate");
-    program->current_word = &program->start_word;
+    
     
     if(!strings_match(program->current_word->current, "{")){
         fprintf(stdout, "\nProgram needs to start with '{'");
@@ -128,194 +127,68 @@ int instruction(Prog *program){
         fprintf(stdout, "\nProgram needs to end with '}'.");
     }
     else{
-//Not sure wether to include this error
         fprintf(stdout, "\nERROR around the word '%s'\n", program->current_word->current);   //NEED TO LOOK HOW TO GIVE END MESSAGE
         program->current_word = program->current_word->next;
     }
     return FALSE;
 }
 
-int loop(Prog *program){
+int fd(Prog *program){
+    int length, variable_index;
     
-    if(!(strings_match(program->current_word->current, "DO"))){
-        //fprintf(stdout,"\nA loop needs to begin with the word DO\n");
-        return FALSE;
-    }
-    program->current_word = program->current_word->next;
-    if(is_var(program) == FALSE){
-        fprintf(stdout,"\nThe word DO needs to be follwed by a variable A - Z\n");
-        return FALSE;
-    }
-    program->loop[letter] = program->current_word->current[0] - 'A';
-    program->current_word = program->current_word->next;
-    
-    if (loop_condition(program) == FALSE){
+    if(!(strings_match(program->current_word->current, "FD"))){
         return FALSE;
     }
     program->current_word = program->current_word->next;
     
-    if(!(strings_match(program->current_word->current, "{"))){
-        fprintf(stdout,"\nThe condition statement in a loop needs to end with a {\n");
-        return FALSE;
-    }
-    
-    return perform_loop(program);
-} 
-
-int loop_condition(Prog *program){
-    if(!(strings_match(program->current_word->current, "FROM"))){
-        fprintf(stdout, "\nThe variable in your loop needs to be followed by the word FROM\n");
-        return FALSE;
-    }
-    program->current_word = program->current_word->next;
-    if((program->loop[start] = get_parameter(program)) == -1){
-        fprintf(stdout, "\nThe word FROM needs to be follwed by a variable A - Z or a number\n");
-        return FALSE;
-    }
-    
-    
-    program->current_word = program->current_word->next;
-    
-    if(!(strings_match(program->current_word->current, "TO"))){
-        fprintf(stdout, "\nThe word DO needs to be follwed by a variable A - Z\n");
-        return FALSE;
-    }
-    
-    program->current_word = program->current_word->next;
-    
-    if((program->loop[stop] = get_parameter(program)) == -1){
-        fprintf(stdout, "\nThe word TO needs to be follwed by a variable A - Z or a number\n");
-        return FALSE;
-    }
-    return TRUE;
-}
-
-int get_parameter(Prog *program){
-
-    if(varnum(program) == TRUE){
-        if(is_var(program) == TRUE){
-            return program->variable[program->current_word->current[0] - 'A'];
+    if (varnum(program) == TRUE){
+        if (is_var(program) == TRUE){
+            variable_index = program->current_word->current[0] - 'A';
+            
+            length = program->variable[variable_index];
         }
         else{
-            return atoi(program->current_word->current);
+            length = atoi(program->current_word->current);
         }
-    }
-    else{
-        return -1;
-    }
-
-}
-
-int perform_loop(Prog *program){
-    words *program_marker;
-    int i;
-    if(program->loop[start] > program->loop[stop]){
-        fprintf(stdout, "\nThe start of your loop has to be less than the end\n");
-        return FALSE;
-    }
-    
-   
-    program->current_word = program->current_word->next;
-    program_marker = program->current_word;
-    for(i = program->loop[start]; i <= program->loop[stop] ; i++){
-        program->variable[program->loop[letter]] = i;
-        program->current_word = program_marker;
-        if (instrctlst(program) == FALSE){
-            return FALSE;
-        }
-    }
-    return TRUE;
-}
-
-int if_condition(Prog *program){
-    if(!(strings_match(program->current_word->current, "IF"))){
-        return FALSE;
-    }
-    program->current_word = program->current_word->next;
-    
-    if (is_var(program) == TRUE){
-        return if_letter(program);
-    }
-    else if(strings_match(program->current_word->current, "COLOUR")){
-        return if_colour(program);    
-    }
-    else{
-        fprintf(stdout, "\nOperation IF needs to be followed by a variable A - Z\n");
-        return FALSE;
-    }
-}
-
-int if_letter(Prog *program){
-    int variable_index_check, variable_index_result;
-    double result;
-    variable_index_check = program->current_word->current[0] - 'A';
-    program->current_word = program->current_word->next;
-    if(!(strings_match(program->current_word->current, ":="))){
-        return FALSE;
-    }
-    program->current_word = program->current_word->next; 
-    if(varnum(program) == TRUE){ 
-        if(is_var(program) == TRUE){
-            variable_index_result = program->current_word->current[0] - 'A';
-            result = program->variable[variable_index_result];
-        }
-        else{
-            result = atof(program->current_word->current);
-        }
-    }
-    else{
-        fprintf(stdout, "\nAn IF statement needs to check a variable against another variable or a number.\n");
-        return FALSE;
-    }
-    if(program->variable[variable_index_check] != result){
         
-        program->assign = FALSE;
+        program->current_length = length;
+        assign_draw(program);
+        return TRUE;
     }
-    
-    program->current_word = program->current_word->next;
-    if(!(strings_match(program->current_word->current, "{"))){
-        fprintf(stdout, "\nAn IF statement needs to end with a {\n");
+    else{
         return FALSE;
     }
-    program->current_word = program->current_word->next;
-    if (instrctlst(program) == FALSE){
-        return FALSE;
-    }
-    program->assign = TRUE;
-    
-    return TRUE; //Parses correctly if the if condition is not met
 }
 
-int if_colour(Prog *program){
-    char colour[LONGEST_COLOUR];
+int lt(Prog *program){
+    if(!(strings_match(program->current_word->current, "LT"))){
+        return FALSE;
+    }
     program->current_word = program->current_word->next;
-    if(!(strings_match(program->current_word->current, ":="))){
-        return FALSE;
+    if (varnum(program) == TRUE){
+        program->current_angle -= atoi(program->current_word->current);
+        return TRUE;
     }
-    program->current_word = program->current_word->next; 
-    if(strlen(program->current_word->current) > LONGEST_COLOUR){
-        fprintf(stdout, "\n%s is not a valid colour.\n", program->current_word->current);
-        return FALSE;
-    }
-    printf("\nColour in IF statement %s\n", program->current_word->current);
-    strcpy(colour, program->current_word->current);
+    else{
     
-    program->current_word = program->current_word->next;
-    if(!strings_match(program->current_word->current, "{")){
-        fprintf(stdout, "\nIF comparison needs to end with {\n");
         return FALSE;
     }
-    if(!strings_match(colour, program->colour)){
-        program->assign = FALSE;
-    }
-    program->current_word = program->current_word->next;
-    if (instrctlst(program) == FALSE){
-        return FALSE;
-    }
-    program->assign = TRUE;
-    return TRUE; //Parses correctly if the if condition is not met
 }
-    
+
+int rt(Prog *program){
+    if(!(strings_match(program->current_word->current, "RT"))){
+        return FALSE;
+    }
+    program->current_word = program->current_word->next;
+    if (varnum(program) == TRUE){
+        program->current_angle += atoi(program->current_word->current);
+        return TRUE;
+    }
+    else{
+        return FALSE;
+    }
+}
+
 int set(Prog *program){
     //printf("\nIn Set");
     
@@ -331,7 +204,7 @@ int set(Prog *program){
         return set_colour(program);    
     }
     else{
-        fprintf(stdout, "\nOperation SET needs to be followed by a variable A - Z\n");
+        fprintf(stdout, "\nOperation SET needs to be followed by a variable A - Z or word 'COLOUR'\n");
         return FALSE;
     }
     
@@ -525,60 +398,174 @@ int check_stack(Prog *program){
     return FALSE; 
 }
 
-int fd(Prog *program){
-    int length, variable_index;
+int loop(Prog *program){
     
-    if(!(strings_match(program->current_word->current, "FD"))){
+    if(!(strings_match(program->current_word->current, "DO"))){
+        //fprintf(stdout,"\nA loop needs to begin with the word DO\n");
         return FALSE;
     }
     program->current_word = program->current_word->next;
     
-    if (varnum(program) == TRUE){
-        if (is_var(program) == TRUE){
-            variable_index = program->current_word->current[0] - 'A';
-            
-            length = program->variable[variable_index];
+    if(is_var(program) == FALSE){
+        fprintf(stdout,"\nThe word DO needs to be follwed by a variable A - Z\n");
+        return FALSE;
+    }
+    program->loop[letter] = program->current_word->current[0] - 'A';
+    program->current_word = program->current_word->next;
+    
+    if (loop_condition(program) == FALSE){
+        return FALSE;
+    }
+    program->current_word = program->current_word->next;
+    
+    return perform_loop(program);
+} 
+
+int loop_condition(Prog *program){
+        
+    
+    if(!(strings_match(program->current_word->current, "FROM"))){
+        fprintf(stdout, "\nThe variable in your loop needs to be followed by the word FROM\n");
+        return FALSE;
+    }
+    program->current_word = program->current_word->next;
+    if((program->loop[start] = get_parameter(program)) == -1){
+        fprintf(stdout, "\nThe word FROM needs to be follwed by a variable A - Z or a number 0 or above\n");
+        return FALSE;
+    }
+    
+    program->current_word = program->current_word->next;
+    
+    if(!(strings_match(program->current_word->current, "TO"))){
+        fprintf(stdout, "\nThe word DO needs to be follwed by a variable A - Z\n");
+        return FALSE;
+    }
+    
+    program->current_word = program->current_word->next;
+    
+    if((program->loop[stop] = get_parameter(program)) == -1){
+        fprintf(stdout, "\nThe word TO needs to be follwed by a variable A - Z or a number 0 or above\n");
+        return FALSE;
+    }
+    return TRUE;
+}
+
+int perform_loop(Prog *program){
+    words *program_marker;
+    if(program->loop[start] < 0 || program->loop[stop] < 0){
+        fprintf(stdout, "\nA DO loop needs positive values to iterate through.\n");
+    }
+    if(program->loop[start] > program->loop[stop]){
+        fprintf(stdout, "\nThe start of your loop has to be less than the end\n");
+        return FALSE;
+    }   
+    
+    program_marker = program->current_word;
+    for(int i = program->loop[start]; i <= program->loop[stop] ; i++){
+        program->variable[program->loop[letter]] = i;
+        program->current_word = program_marker;
+        if (validate(program) == FALSE){
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
+int get_parameter(Prog *program){
+
+    if(varnum(program) == TRUE){
+        if(is_var(program) == TRUE){
+            return program->variable[program->current_word->current[0] - 'A'];
         }
         else{
-            length = atoi(program->current_word->current);
+            return atoi(program->current_word->current);
         }
-        
-        program->current_length = length;
-        assign_draw(program);
-        return TRUE;
     }
     else{
-        return FALSE;
+        return -1;
     }
 }
 
-int lt(Prog *program){
-    if(!(strings_match(program->current_word->current, "LT"))){
+
+
+int if_condition(Prog *program){
+    if(!(strings_match(program->current_word->current, "IF"))){
         return FALSE;
     }
     program->current_word = program->current_word->next;
-    if (varnum(program) == TRUE){
-        program->current_angle -= atoi(program->current_word->current);
-        return TRUE;
-    }
-    else{
     
+    if (is_var(program) == TRUE){
+        return if_letter(program);
+    }
+    else if(strings_match(program->current_word->current, "COLOUR")){
+        return if_colour(program);    
+    }
+    else{
+        fprintf(stdout, "\nOperation IF needs to be followed by a variable A - Z\n");
         return FALSE;
     }
 }
 
-int rt(Prog *program){
-    if(!(strings_match(program->current_word->current, "RT"))){
+int if_letter(Prog *program){
+    int variable_index_check, variable_index_result;
+    double result;
+    variable_index_check = program->current_word->current[0] - 'A';
+    program->current_word = program->current_word->next;
+    if(!(strings_match(program->current_word->current, ":="))){
         return FALSE;
     }
-    program->current_word = program->current_word->next;
-    if (varnum(program) == TRUE){
-        program->current_angle += atoi(program->current_word->current);
-        return TRUE;
+    program->current_word = program->current_word->next; 
+    if(varnum(program) == TRUE){ 
+        if(is_var(program) == TRUE){
+            variable_index_result = program->current_word->current[0] - 'A';
+            result = program->variable[variable_index_result];
+        }
+        else{
+            result = atof(program->current_word->current);
+        }
     }
     else{
+        fprintf(stdout, "\nAn IF statement needs to check a variable against another variable or a number.\n");
         return FALSE;
     }
+    if(program->variable[variable_index_check] != result){
+        
+        program->assign = FALSE;
+    }
+    
+    program->current_word = program->current_word->next;
+    if (validate(program) == FALSE){
+        return FALSE;
+    }
+    program->assign = TRUE;
+    
+    return TRUE; //Parses correctly if the if condition is not met
+}
+
+int if_colour(Prog *program){
+    char colour[LONGEST_COLOUR];
+    program->current_word = program->current_word->next;
+    if(!(strings_match(program->current_word->current, ":="))){
+        return FALSE;
+    }
+    program->current_word = program->current_word->next; 
+    if(strlen(program->current_word->current) > LONGEST_COLOUR){
+        fprintf(stdout, "\n%s is not a valid colour.\n", program->current_word->current);
+        return FALSE;
+    }
+    printf("\nColour in IF statement %s\n", program->current_word->current);
+    strcpy(colour, program->current_word->current);
+    
+    
+    if(!strings_match(colour, program->colour)){
+        program->assign = FALSE;
+    }
+    program->current_word = program->current_word->next;
+    if (validate(program) == FALSE){
+        return FALSE;
+    }
+    program->assign = TRUE;
+    return TRUE; //Parses correctly if the if condition is not met
 }
 
 void assign_draw(Prog *program){
