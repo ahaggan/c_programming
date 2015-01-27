@@ -109,8 +109,11 @@ FILE* check_input(Prog *program, int argc, char **argv);
 void initialise_program(Prog *program);
 
 /*
-These functions are called recursively to form the parser
+
+These functions form the parser
+
 */
+
 //Checks for an opening brace then calls instrctlst to check the rest
 int validate(Prog *program);
 //Checks either for an ending brace or a valid instruction
@@ -118,17 +121,6 @@ int instrctlst(Prog *program);
 //Checks for a valid instruction given in formal grammer, if the program doesn't have a correct ending displays error message
 int instruction(Prog *program);
 
-int polish(Prog *program);
-
-int varnum(Prog *program);
-
-
-
-
-
-/*
-Functions used in parsing, they are called by other functions, but are not recursive
-*/
 //function assigns a current length value to the program struct the calls assign_draw to add this new coordinate to the draw linked list
 int fd(Prog *program);
 //functions update the current angle value to the program struct adds for right turn and subtracts for left.
@@ -159,38 +151,56 @@ Functions will return TRUE if the grammer is correct, the functions will set an 
 int if_letter(Prog *program);
 int if_colour(Prog *program);
 
+//Function checks for a ';' or calls functions which check for a variable/number or an operation, if all these are false, returns an error message.
+int polish(Prog *program);
+//Function calls the is_var and is_number functions and will return TRUE if the current word is a variable or a number
+int varnum(Prog *program);
+//Function returns TRUE if the current word is a variable A-Z
+int is_var(Prog *program);
+//Function returns TRUE if the current word is a number
+int is_number(Prog *program);
 
-
+//Function checks the stack, to make sure there are enough numbers in it to perform an operation, it then calls each operation function in turn to check for a valid operation.
+int op(Prog *program);
+//Checks that the current and previous stack pointers are not NULL(i.e. contains at least two values)
+int check_stack(Prog *program);
+/*
+The operation functions check for thier operations sign, if found, they pop two numbers off the stack and perform their specific operation.
+*/
 int multiply(Prog *program);
 int divide(Prog *program);
 int subtract(Prog *program);
 int add(Prog *program);
-int check_stack(Prog *program);
-double pop(stack *pointer);
+
+//returns the current number on top of the program->polish stack and frees the space that was occupied by it.
+double pop(Prog *program);
+//pushes the given number to the top of the the given stack
 void push(stack *tmp_pointer, double number);
 
 
-int is_var(Prog *program);
-int is_number(Prog *program);
-
-
-int op(Prog *program);
-int make_positive(int angle);
-
-
 /*
-Test function
-*/
 
+Test function:  - Performs whitebox tests on each function in turn
+                - Performs a blackbox test on the parser as a whole, by passing test files to the parse function
+*/
 void test(void);
 
+
 /*
+
 Function used to interpret the commands in the file that is being parsed
+
 */
-//Adds the x and y coordinates of the next point to draw to into a draw array.
+
+//Adds the x and y coordinates of the next point to draw to the draw linked list, it calls the make positive, assign colour and set_new_xy
 void assign_draw(Prog *program);
+//Takes an angle, returns % 360 if above 0, or recursively calls itself with the current angle + 360.
+int make_positive(int angle);
+//Assigns the corresponding RGB parts of the colour element of the program struct to the current draw struct.
 void assign_colour(Prog *program);
+//Uses the current_angle and current_length elements of the porgram struct
 void set_new_xy(Prog *program);
+
 //Function contained in ashley_sdl.c and uses the draw array to draw the program file on the screen in SDL
 void draw_turtle(Prog *program);
 

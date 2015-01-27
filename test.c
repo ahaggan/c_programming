@@ -213,6 +213,48 @@ void test(void){
     else{
         print_outcome(test.results, "Test_parse", "FAILED");
     }
+//FROM HERE
+    if(test_if_condition(&test) == PASSED){
+        print_outcome(test.results, "Test_if_condition", "PASSED");
+    }
+    else{
+        print_outcome(test.results, "Test_if_condition", "FAILED");
+    }
+    
+    if(test_if_letter(&test) == PASSED){
+        print_outcome(test.results, "Test_if_letter", "PASSED");
+    }
+    else{
+        print_outcome(test.results, "Test_if_letter", "FAILED");
+    }
+
+    if(test_if_colour(&test) == PASSED){
+        print_outcome(test.results, "Test_if_colour", "PASSED");
+    }
+    else{
+        print_outcome(test.results, "Test_if_colour", "FAILED");
+    }
+
+    if(test_assign_colour(&test) == PASSED){
+        print_outcome(test.results, "Test_assign_colour", "PASSED");
+    }
+    else{
+        print_outcome(test.results, "Test_assign_colour", "FAILED");
+    }
+
+    if(test_set_colour(&test) == PASSED){
+        print_outcome(test.results, "Test_set_colour", "PASSED");
+    }
+    else{
+        print_outcome(test.results, "Test_set_colour", "FAILED");
+    }
+
+    if(test_set_letter(&test) == PASSED){
+        print_outcome(test.results, "Test_set_letter", "PASSED");
+    }
+    else{
+        print_outcome(test.results, "Test_set_letter", "FAILED");
+    }
    
 }
 
@@ -272,6 +314,25 @@ int test_parse(Test *test){
     return NOT_PASSED;
 }
 
+int test_if_condition(Test *test){
+    return NOT_PASSED;
+}
+int test_if_letter(Test *test){
+    return NOT_PASSED;
+}
+int test_if_colour(Test *test){
+    return NOT_PASSED;
+}
+int test_assign_colour(Test *test){
+    return NOT_PASSED;
+}
+int test_set_colour(Test *test){
+    return NOT_PASSED;
+}
+int test_set_letter(Test *test){
+    return NOT_PASSED;
+}
+
 int test_initialise_program(Test *test){
     return NOT_PASSED;
 }
@@ -284,8 +345,8 @@ int test_push(FILE *test_pointer){
     no_of_tests += 1;
     push(program.polish, 10);
     push(program.polish, 20);
-    if(pop(program.polish) == 20){
-        if(pop(program.polish) == 10){
+    if(pop(&program) == 20){
+        if(pop(&program) == 10){
             pass_count += 1;
             fprintf(test_pointer, "\nPush test 1: Passed");
         }
@@ -650,7 +711,7 @@ int test_pop(Test *test){
     //Function pops the last number off the stack return TRUE if it's equal to the last number pushed
     //Test should return FALSE, there is nothing in the stack
     test->current += 1;
-    if(pop(test->program->polish) == FALSE ){
+    if(pop(test->program) == FALSE ){
         test->pass += 1;
         fprintf(test->results, "\npop test 1: Passed");
     }
@@ -662,7 +723,7 @@ int test_pop(Test *test){
     //Test should return the number last popped onto stack
     test->current += 1;
     push(test->program->polish, 10);
-    if(pop(test->program->polish) == 10){
+    if(pop(test->program) == 10){
         test->pass += 1;
         fprintf(test->results, "\npop test 2: Passed");
     }
@@ -728,7 +789,7 @@ int test_op(Test *test){
     tester(test);
     
     //Tests when the stack has too few numbers should return FALSE
-    pop(test->program->polish);
+    pop(test->program);
     
     strcpy(test->test_program[0], "+");
     write_program(test);
@@ -752,7 +813,7 @@ int test_multiply(Test *test){
     push(test->program->polish, 3);
     
     multiply(test->program);
-    if(pop(test->program->polish) == 30){
+    if(pop(test->program) == 30){
         fprintf(test->results, "\nMultiply test 1: Passed");
         test->pass += 1;
     }
@@ -764,7 +825,7 @@ int test_multiply(Test *test){
     push(test->program->polish, 2.5);
     push(test->program->polish, 3);
     multiply(test->program);
-    if(pop(test->program->polish) == 7.5){
+    if(pop(test->program) == 7.5){
         fprintf(test->results, "\nMultiply test 2: Passed");
         test->pass += 1;
     }
@@ -788,7 +849,7 @@ int test_divide(Test *test){
     push(test->program->polish, 10);
     push(test->program->polish, 2);
     divide(test->program);
-    if(pop(test->program->polish) == 5){
+    if(pop(test->program) == 5){
         fprintf(test->results, "\nDivide test 1: Passed");
         test->pass += 1;
     }
@@ -801,7 +862,7 @@ int test_divide(Test *test){
     push(test->program->polish, 2.40);
     push(test->program->polish, 2);
     divide(test->program);
-    if(pop(test->program->polish) == 1.2){
+    if(pop(test->program) == 1.2){
         fprintf(test->results, "\nDivide test 2: Passed");
         test->pass += 1;
     }
@@ -825,7 +886,7 @@ int test_subtract(Test *test){
     push(test->program->polish, 10);
     push(test->program->polish, 1);
     subtract(test->program);
-    if(pop(test->program->polish) == 9){
+    if(pop(test->program) == 9){
         fprintf(test->results, "\nSubtract test 1: Passed");
         test->pass += 1;
     }
@@ -838,7 +899,7 @@ int test_subtract(Test *test){
     push(test->program->polish, 3.79);
     push(test->program->polish, 1.88);
     subtract(test->program);
-    answer = (int)(100 * pop(test->program->polish)); //Tests to 2 dp of accuracy
+    answer = (int)(100 * pop(test->program)); //Tests to 2 dp of accuracy
     if(answer == 191){
         fprintf(test->results, "\nSubtract test 2: Passed");
         test->pass += 1;
@@ -869,7 +930,7 @@ int test_add(Test *test){
     push(test->program->polish, 1);
     push(test->program->polish, 1);
     add(test->program);
-    if(pop(test->program->polish) == 2){
+    if(pop(test->program) == 2){
         fprintf(test->results, "\nAdd test 1: Passed");
         test->pass += 1;
     }
@@ -882,7 +943,7 @@ int test_add(Test *test){
     push(test->program->polish, 0.1177);
     add(test->program);
     
-    if(pop(test->program->polish) == 64.009800){
+    if(pop(test->program) == 64.009800){
         fprintf(test->results, "\nAdd test 2: Passed");
         test->pass += 1;
     }

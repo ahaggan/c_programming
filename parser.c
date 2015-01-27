@@ -26,6 +26,28 @@ int main(int argc, char **argv){
     
 }
 
+
+void initialise_program(Prog *program){
+    int i;
+    program->current_word = (words*)malloc(sizeof(words));
+    program->start_coordinate.current_x = WINDOW_WIDTH/2;
+    program->start_coordinate.current_y = WINDOW_HEIGHT/2;
+    
+    program->assign = TRUE; 
+    strcpy(program->colour, "WHITE");
+    program->current_angle = 0;
+    program->coordinate = &program->start_coordinate;
+    program->polish = (stack*)malloc(sizeof(stack));
+    //program->polish->pointer = (polish_list*)malloc(sizeof(polish_list));
+    for(i = 0; i < LETTERS; i++){
+        program->variable[i] = 0;
+    }
+   
+    program->test = FALSE;
+   
+    
+}
+
 FILE* check_input(Prog *program, int argc, char **argv){
     FILE *file_pointer = NULL;
     
@@ -189,6 +211,56 @@ int rt(Prog *program){
     }
 }
 
+int varnum(Prog *program){
+    
+    if(is_number(program) == TRUE){
+        return TRUE;
+    }
+    else if(is_var(program) == TRUE){
+        return TRUE;
+    }
+    return FALSE;
+    
+}
+
+int is_number(Prog *program){
+    
+    int word_length, i, decimal_point = 0;
+    //double number;
+    word_length = strlen(program->current_word->current);
+    if(!isdigit(program->current_word->current[0])){
+        if((program->current_word->current[0] != '-') || word_length == 1){
+            return FALSE;
+        }
+    }
+    //NEED TO MAKE SURE YOU CAN ONLY HAVE ONE DECIMAL PLACE
+    for( i = 1; i < word_length; i++){
+        if(!isdigit(program->current_word->current[i])){
+            if((program->current_word->current[i] != '.') || decimal_point > 0){
+                fprintf(stdout, "\nThe value %s, is not valid with operation %s. Needs to be a number.", program->current_word->current, program->current_word->previous->current);
+                return FALSE;
+            }
+            else{
+                decimal_point += 1;
+            }
+        }
+    }
+    return TRUE;
+}
+
+int is_var(Prog *program){
+    
+    int word_length;
+    word_length = strlen(program->current_word->current);
+    if(word_length != 1){
+        return FALSE;
+    }
+    if(isupper(program->current_word->current[0])){
+        return TRUE;
+    }
+    return FALSE;
+}
+
 int set(Prog *program){
     //printf("\nIn Set");
     
@@ -268,7 +340,8 @@ int polish(Prog *program){
     
     if(strings_match(program->current_word->current, ";")){
         
-            program->result = pop(program->polish);
+            program->result = pop(program);
+           
             return TRUE;
         
     }
@@ -322,14 +395,17 @@ int op(Prog *program){
     }
 }
 
-double pop(stack *tmp_pointer){
+double pop(Prog *program){
     //printf("\nIn Pop");
     double number;
-    if (tmp_pointer->pointer == NULL){
-        return FALSE;
+    polish_list *tmp;
+    if (program->polish->pointer == NULL){
+        return FALSE;   //Should never happen because check stack would be called before this to check stack has numbers, this will just return 0
     }
-    number = tmp_pointer->pointer->number;
-    tmp_pointer->pointer = tmp_pointer->pointer->previous;
+    number = program->polish->pointer->number;
+    tmp = program->polish->pointer->previous;
+    free(program->polish->pointer);
+    program->polish->pointer = tmp;
     return number;
 }
 
@@ -345,8 +421,8 @@ void push(stack *tmp_polish, double number){
 int add(Prog *program){
     //printf("\nIn Add");
     double one, two, result;
-    one = pop(program->polish);
-    two = pop(program->polish);
+    one = pop(program);
+    two = pop(program);
     
     result = one + two;
     push(program->polish, result);
@@ -356,8 +432,8 @@ int add(Prog *program){
 
 int subtract(Prog *program){
     double one, two, result;
-    one = pop(program->polish);
-    two = pop(program->polish);
+    one = pop(program);
+    two = pop(program);
     
     result = two - one; // if this was other way round and I got a negative number, the line is just smaller not opposite?
     push(program->polish, result);
@@ -366,8 +442,8 @@ int subtract(Prog *program){
 
 int multiply(Prog *program){
     double one, two, result;
-    one = pop(program->polish);
-    two = pop(program->polish);
+    one = pop(program);
+    two = pop(program);
     
    
     result = one * two; 
@@ -378,8 +454,8 @@ int multiply(Prog *program){
 
 int divide(Prog *program){
     double one, two, result;
-    one = pop(program->polish);
-    two = pop(program->polish);
+    one = pop(program);
+    two = pop(program);
     
     result = two / one; 
     push(program->polish, result);
@@ -647,79 +723,6 @@ int make_positive(int angle){
     else{
         return make_positive(angle+360);
     }
-}
-
-int varnum(Prog *program){
-    
-    if(is_number(program) == TRUE){
-        return TRUE;
-    }
-    else if(is_var(program) == TRUE){
-        return TRUE;
-    }
-    return FALSE;
-    
-}
-
-int is_number(Prog *program){
-    
-    int word_length, i;
-    //double number;
-    word_length = strlen(program->current_word->current);
-    if(!isdigit(program->current_word->current[0]) && program->current_word->current[0] != '-'){
-        
-        return FALSE;
-    }
-    //NEED TO MAKE SURE YOU CAN ONLY HAVE ONE DECIMAL PLACE
-    for( i = 1; i < word_length; i++){
-        if(!isdigit(program->current_word->current[i]) && program->current_word->current[i] != '.'){
-            fprintf(stdout, "\nThe value %s, is not valid with operation %s. Needs to be a whole number at least 0", program->current_word->current, program->current_word->previous->current);
-            return FALSE;
-        }
-    }
-    /*
-    number = atof(program->words[program->current_word]);
-    
-    if(number == 0){
-        fprintf(stdout, "\nThe value %s, is not valid with operation %s. Needs to be a whole number above 1", program->words[program->current_word], program->words[program->current_word - 1]);
-        return FALSE;
-    }
-    */
-    return TRUE;
-}
-
-int is_var(Prog *program){
-    
-    int word_length;
-    word_length = strlen(program->current_word->current);
-    if(word_length != 1){
-        return FALSE;
-    }
-    if(isupper(program->current_word->current[0])){
-        return TRUE;
-    }
-    return FALSE;
-}
-
-void initialise_program(Prog *program){
-    int i;
-    program->current_word = (words*)malloc(sizeof(words));
-    program->start_coordinate.current_x = WINDOW_WIDTH/2;
-    program->start_coordinate.current_y = WINDOW_HEIGHT/2;
-    
-    program->assign = TRUE;
-    strcpy(program->colour, "WHITE");
-    program->current_angle = 0;
-    program->coordinate = &program->start_coordinate;
-    program->polish = (stack*)malloc(sizeof(stack));
-    //program->polish->pointer = (polish_list*)malloc(sizeof(polish_list));
-    for(i = 0; i < LETTERS; i++){
-        program->variable[i] = 0;
-    }
-   
-    program->test = FALSE;
-   
-    
 }
 
 

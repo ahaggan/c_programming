@@ -71,16 +71,17 @@ int test_rt(Test *test);
 int test_instrctlst(Test *test);
 int test_instruction(Test *test);
 int test_validate(Test *test);
-
+//Still to complete
+int test_if_condition(Test *test);
+int test_if_letter(Test *test);
+int test_if_colour(Test *test);
+int test_assign_colour(Test *test);
+int test_set_colour(Test *test);
+int test_set_letter(Test *test);
 /*
 New tests needed:
 
-int test_if_condition
-int test_if_letter
-int test_if_colour
-int test_assign_colour
-int test_set_colour
-int test_set_letter
+
 int test_draw_turtle
 
 int test_assign_draw
