@@ -107,7 +107,12 @@ int parse(Prog *program);
 FILE* check_input(Prog *program, int argc, char **argv);
 //Sets all the initial values to the program struct, such as the start of both linked lists and the first draw coordinates
 void initialise_program(Prog *program);
+/*
+Functions used at the end of the program to free all malloced space
+*/
+void free_space(Prog *program);
 
+void free_words(words *start);
 /*
 
 These functions form the parser

@@ -1,3 +1,6 @@
+/*
+This is the .c file for the Turtle assignment. An overview of this module and of each function is given in the header file. Comments are made throughout this code to help with ambiguous code
+*/
 #include "parser.h"
 
 int main(int argc, char **argv){
@@ -11,18 +14,18 @@ int main(int argc, char **argv){
     if(program.file_pointer == NULL){
         if(program.test == TRUE){
             test();
-            return 0;
+            return 0; //Performed as expected
         }
-        return 1;
+        return 1;   //Encountered an error
     }
     else{
         if(parse(&program) == TRUE){
-            
             draw_turtle(&program);
-            return 0;
+            free(program.current_word);
+            return 0;   //Performed as expected
         }
     }
-    return 1;
+    return 1;   //Encountered an error
     
 }
 
@@ -87,7 +90,7 @@ int parse(Prog *program){
         return FALSE;
     }
     
-    fprintf(stdout, "\nPARSED OK!");
+    fprintf(stdout, "\nPARSED OK!\n");
     return TRUE;
 }
 
@@ -375,7 +378,7 @@ int op(Prog *program){
     //printf("\nIn Op");
     if(check_stack(program) == FALSE){
     
-        fprintf(stdout, "\nAn operation +, -, * or / needs to be preceeded by at least 2 numbers or variables\n");
+        fprintf(stderr, "\nAn operation +, -, * or / needs to be preceeded by at least 2 numbers or variables\n");
         return FALSE;
     }
     else if(strings_match(program->current_word->current, "+")){
@@ -393,6 +396,21 @@ int op(Prog *program){
     else{
         return FALSE;
     }
+}
+
+int check_stack(Prog *program){
+    //printf("\nIn Check_stack");
+    stack *tmp_stack;
+   
+    tmp_stack = program->polish;
+    
+    if(tmp_stack->pointer == NULL){
+        return FALSE;
+    }
+    if(tmp_stack->pointer->previous == NULL){
+        return FALSE;
+    }
+    return TRUE;
 }
 
 double pop(Prog *program){
@@ -462,18 +480,6 @@ int divide(Prog *program){
     return TRUE;  
 }  
 
-int check_stack(Prog *program){
-    //printf("\nIn Check_stack");
-    stack *tmp_stack;
-   
-    tmp_stack = program->polish;
-    
-    if(tmp_stack->pointer != NULL && tmp_stack->pointer->previous != NULL){
-        return TRUE;
-    }
-    return FALSE; 
-}
-
 int loop(Prog *program){
     
     if(!(strings_match(program->current_word->current, "DO"))){
@@ -528,17 +534,23 @@ int loop_condition(Prog *program){
 
 int perform_loop(Prog *program){
     words *program_marker;
-    if(program->loop[start] < 0 || program->loop[stop] < 0){
+    int start_loop, stop_loop, letter_loop;
+    start_loop = program->loop[start];
+    stop_loop = program->loop[stop];
+    letter_loop = program->loop[letter];
+    printf("\nValue of loop[start]: %d\n", program->loop[start]);
+    printf("\nValue of loop[stop]: %d\n", program->loop[stop]);
+    if(start_loop < 0 || stop_loop < 0){
         fprintf(stdout, "\nA DO loop needs positive values to iterate through.\n");
     }
-    if(program->loop[start] > program->loop[stop]){
+    if(start_loop > stop_loop){
         fprintf(stdout, "\nThe start of your loop has to be less than the end\n");
         return FALSE;
     }   
     
     program_marker = program->current_word;
-    for(int i = program->loop[start]; i <= program->loop[stop] ; i++){
-        program->variable[program->loop[letter]] = i;
+    for(int i = start_loop; i <= stop_loop ; i++){
+        program->variable[letter_loop] = i;
         program->current_word = program_marker;
         if (validate(program) == FALSE){
             return FALSE;
@@ -577,7 +589,7 @@ int if_condition(Prog *program){
         return if_colour(program);    
     }
     else{
-        fprintf(stdout, "\nOperation IF needs to be followed by a variable A - Z\n");
+        fprintf(stdout, "\nOperation IF needs to be followed by a variable A - Z or word COLOUR\n");
         return FALSE;
     }
 }
@@ -629,7 +641,7 @@ int if_colour(Prog *program){
         fprintf(stdout, "\n%s is not a valid colour.\n", program->current_word->current);
         return FALSE;
     }
-    printf("\nColour in IF statement %s\n", program->current_word->current);
+    
     strcpy(colour, program->current_word->current);
     
     
@@ -645,13 +657,12 @@ int if_colour(Prog *program){
 }
 
 void assign_draw(Prog *program){
-    //printf("\nCurrent angle = %d", program->current_angle);
     if(program->assign == TRUE){
     
         draw *new_coordinate;
         new_coordinate = (draw*)malloc(sizeof(draw));
         program->current_angle = make_positive(program->current_angle); //incase current angle has become negative
-        //printf("\nCurrent angle = %d", program->current_angle);
+        
         program->coordinate->next = new_coordinate;
         new_coordinate->previous = program->coordinate;
         new_coordinate->current_x = program->coordinate->current_x;

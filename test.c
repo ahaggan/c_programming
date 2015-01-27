@@ -1,263 +1,48 @@
 #include "test.h"
 
 void test(void){
-
-	//FILE *test_pointer;
 	Test test;
-	//Prog program;
-	//test.program = &program;
-	//test_pointer = fopen("test_results.txt", "w");
+	int i; 
+    test.no_passed = 0;
+    test.no_failed = 0;
+    //Array of function pointers to the test functions
+    int(*test_function[NO_TESTS])(Test*) = {&test_parse, &test_check_input, &test_initialise_program, &test_validate, &test_instrctlst, &test_instruction, &test_fd, &test_lt, &test_rt, &test_make_positive, &test_varnum, &test_push, &test_get_parameter, &test_is_number, &test_is_var, &test_check_stack, &test_add, &test_subtract, &test_divide, &test_multiply, &test_op, &test_pop, &test_polish, &test_set, &test_loop_condition, &test_perform_loop, &test_loop, &test_set_new_xy, &test_if_condition, &test_if_letter, &test_if_colour, &test_assign_colour, &test_set_colour, &test_set_letter};
+    //Array of function names in the same order as above
+    char function_name[NO_TESTS][FUNCTION_NAME] = {"Test parse", "Test check input", "Test initialise program", "Test validate", "Test instrctlst", "Test instruction","Test fd","Test lt","Test rt","Test make positive", "Test varnum", "Test push", "Test get parameter", "Test is number", "Test is var","Test check stack","Test add", "Test subtract", "Test divide", "Test multiply","Test op","Test pop", "Test polish", "Test set", "Test loop condition", "Test perform loop", "Test loop", "Test set new xy", "Test if condition", "Test if letter", "Test if colour", "Test assign colour", "Test set colour", "Test set letter"};
+
 	test.results = fopen("test_results.txt", "w");
 	fprintf(test.results, "Below are the test results for each function:\n");
-    if (test_check_input(&test) == PASSED){
-        print_outcome(test.results, "Check_input", "PASSED");
-
-    }
-    else{
-        print_outcome(test.results, "Check_input", "FAILED");
-    }   
-    
-    if (test_initialise_program(&test) == PASSED){
-        print_outcome(test.results, "Test_initialise_program", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_initialise_program", "FAILED");
+    //Runs through each test in the above array and prints the results
+    for(i = 0; i < NO_TESTS; i++){
+        run_test(test_function[i], &test, function_name[i]);
+        fprintf(stdout, "\nTEST %s COMPLETED\n", function_name[i]);
     }
     
-    if(test_validate(&test) == PASSED){
-        print_outcome(test.results, "Test_validate", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_validate", "FAILED");
-    }
+    fprintf(test.results, "\nNUMBER OF TESTS PASSED: %d\n", test.no_passed);
+    fprintf(test.results, "\nNUMBER OF TESTS FAILED: %d\n", test.no_failed);
+    fclose(test.results);
     
-    if(test_instrctlst(&test) == PASSED){
-        print_outcome(test.results, "Test_instrctlst", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_instrctlst", "FAILED");
-    }
     
-    if(test_instruction(&test) == PASSED){
-        print_outcome(test.results, "Test_instruction", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_instruction", "FAILED");
-    }
-    
-    if(test_fd(&test) == PASSED){
-        print_outcome(test.results, "Test_fd", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_fd", "FAILED");
-    }
-    
-    if(test_lt(&test) == PASSED){
-        print_outcome(test.results, "Test_lt", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_lt", "FAILED");
-    }
-    
-    if(test_rt(&test) == PASSED){
-        print_outcome(test.results, "Test_rt", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_rt", "FAILED");
-    }
-    
-    if(test_make_positive(test.results) == PASSED){
-        print_outcome(test.results, "Test_make_positive", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_make_positive", "FAILED");
-    }
     /*
     if(test_assign_draw(&test) == PASSED){ //Not sure how to test this?
-        print_outcome(test.results, "Test_assign_draw", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_assign_draw", "FAILED");
-    }
+    
     
     */
-    if(test_varnum(&test) == PASSED){
-        print_outcome(test.results, "Test_varnum", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_varnum", "FAILED");
-    }
-    
-    if(test_push(test.results) == PASSED){
-        print_outcome(test.results, "Test_push", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_push", "FAILED");
-    }
 
-    if(test_get_parameter(&test) == PASSED){
-        print_outcome(test.results, "Test_get_parameter", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_get_parameter", "FAILED");
-    }
-    
-    if(test_is_number(&test) == PASSED){
-        print_outcome(test.results, "Test_is_number", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_is_number", "FAILED");
-    }
-    
-    if(test_is_var(&test) == PASSED){
-        print_outcome(test.results, "Test_is_var", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_is_var", "FAILED");
-    }
-    
-    if(test_check_stack(&test) == PASSED){
-        print_outcome(test.results, "Test_check_stack", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_check_stack", "FAILED");
-    }
-    
-    if(test_add(&test) == PASSED){
-        print_outcome(test.results, "Test_add", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_add", "FAILED");
-    }
-    
-    if(test_subtract(&test) == PASSED){
-        print_outcome(test.results, "Test_subtract", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_subtract", "FAILED");
-    }
-    
-    if(test_divide(&test) == PASSED){
-        print_outcome(test.results, "Test_divide", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_divide", "FAILED");
-    }
-    
-    if(test_multiply(&test) == PASSED){
-        print_outcome(test.results, "Test_multiply", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_multiply", "FAILED");
-    }
-    
-    if(test_op(&test) == PASSED){
-        print_outcome(test.results, "Test_op", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_op", "FAILED");
-    }
-    
-    if(test_pop(&test) == PASSED){
-        print_outcome(test.results, "Test_pop", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_pop", "FAILED");
-    }
-    
-    if(test_polish(&test) == PASSED){
-        print_outcome(test.results, "Test_polish", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_polish", "FAILED");
-    }
-    
-    if(test_set(&test) == PASSED){
-        print_outcome(test.results, "Test_set", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_set", "FAILED");
-    }
-    
-    if(test_loop_condition(&test) == PASSED){
-        print_outcome(test.results, "Test_loop_condition", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_loop_condition", "FAILED");
-    }
-    
-    if(test_perform_loop(&test) == PASSED){
-        print_outcome(test.results, "Test_perform_loop", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_perform_loop", "FAILED");
-    }
-    
-    if(test_loop(&test) == PASSED){
-        print_outcome(test.results, "Test_loop", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_loop", "FAILED");
-    }
-    
-    if(test_set_new_xy(&test) == PASSED){
-        print_outcome(test.results, "Test_set_new_xy", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_set_new_xy", "FAILED");
-    }
-
-    if(test_parse(&test) == PASSED){
-        print_outcome(test.results, "Test_parse", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_parse", "FAILED");
-    }
-//FROM HERE
-    if(test_if_condition(&test) == PASSED){
-        print_outcome(test.results, "Test_if_condition", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_if_condition", "FAILED");
-    }
-    
-    if(test_if_letter(&test) == PASSED){
-        print_outcome(test.results, "Test_if_letter", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_if_letter", "FAILED");
-    }
-
-    if(test_if_colour(&test) == PASSED){
-        print_outcome(test.results, "Test_if_colour", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_if_colour", "FAILED");
-    }
-
-    if(test_assign_colour(&test) == PASSED){
-        print_outcome(test.results, "Test_assign_colour", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_assign_colour", "FAILED");
-    }
-
-    if(test_set_colour(&test) == PASSED){
-        print_outcome(test.results, "Test_set_colour", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_set_colour", "FAILED");
-    }
-
-    if(test_set_letter(&test) == PASSED){
-        print_outcome(test.results, "Test_set_letter", "PASSED");
-    }
-    else{
-        print_outcome(test.results, "Test_set_letter", "FAILED");
-    }
    
 }
 
+void run_test(int(*test_function)(Test*), Test *test, char *test_name){
+    if(test_function(test) == PASSED){
+        print_outcome(test->results, test_name, "PASSED");
+        test->no_passed += 1;
+    }
+    else{
+        print_outcome(test->results, test_name, "FAILED");
+        test->no_failed += 1;
+    }
+}
+        
 void write_program(Test *test){
     int i = 0;
     words *new_word;
@@ -303,10 +88,48 @@ int test_parse(Test *test){
     initialise_test(test, &program);
     strcpy(test->name, "parse");
     test->function = &parse;
-
+    
+    //Basic FD RT and LT used should PASS
     test->program->file_pointer = fopen("test1.txt", "r");
     test->condition = TRUE;
     tester(test);
+
+    //Basic DO loop used should PASS
+    test->program->file_pointer = fopen("test2.txt", "r");
+    test->condition = TRUE;
+    tester(test);
+
+    //DO loop using polish multiplication should PASS
+    test->program->file_pointer = fopen("test3.txt", "r");
+    test->condition = TRUE;
+    tester(test);
+
+    //Nested loop using multiple letters and polish operations should PASS
+    test->program->file_pointer = fopen("test4.txt", "r");
+    test->condition = TRUE;
+    tester(test);
+
+    //Basic SET COLOUR instruction used should PASS
+    test->program->file_pointer = fopen("test5.txt", "r");
+    test->condition = TRUE;
+    tester(test);
+
+    //SET COLOUR instruction used in a DO loop should PASS
+    test->program->file_pointer = fopen("test6.txt", "r");
+    test->condition = TRUE;
+    tester(test);
+    
+    //IF statement used in a DO loop should PASS
+    test->program->file_pointer = fopen("test7.txt", "r");
+    test->condition = TRUE;
+    tester(test);
+
+    //Multiple IF statements used in a DO loop should PASS
+    test->program->file_pointer = fopen("test8.txt", "r");
+    test->condition = TRUE;
+    tester(test);
+
+    
 
     if(test->pass == test->current){
         return PASSED;
@@ -315,52 +138,388 @@ int test_parse(Test *test){
 }
 
 int test_if_condition(Test *test){
+    Prog program;
+    initialise_test(test, &program);
+    strcpy(test->name, "If_condition");
+    test->function = &if_condition;
+    
+    
+    //Program will return TRUE, passed a basic if statement with number
+    
+    strcpy(test->test_program[0], "IF");
+    strcpy(test->test_program[1], "A");
+    strcpy(test->test_program[2], ":=");
+    strcpy(test->test_program[3], "7");
+    strcpy(test->test_program[4], "{");
+    strcpy(test->test_program[5], "}");
+    write_program(test);
+    test->condition = TRUE;
+    tester(test);
+
+    //Program will return FALSE, passed a basic statement doesn't start with IF
+    
+    strcpy(test->test_program[0], "When");
+    strcpy(test->test_program[1], "A");
+    strcpy(test->test_program[2], ":=");
+    strcpy(test->test_program[3], "7");
+    strcpy(test->test_program[4], "{");
+    strcpy(test->test_program[5], "}");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
+
+    //Program will return TRUE, passed a basic statement comparing to variable
+    strcpy(test->test_program[0], "IF");
+    strcpy(test->test_program[1], "A");
+    strcpy(test->test_program[2], ":=");
+    strcpy(test->test_program[3], "C");
+    strcpy(test->test_program[4], "{");
+    strcpy(test->test_program[5], "}");
+    write_program(test);
+    test->condition = TRUE;
+    tester(test);
+
+    //Program will return FALSE, comparing a variable to a colour
+    strcpy(test->test_program[0], "IF");
+    strcpy(test->test_program[1], "A");
+    strcpy(test->test_program[2], ":=");
+    strcpy(test->test_program[3], "BLUE");
+    strcpy(test->test_program[4], "{");
+    strcpy(test->test_program[5], "}");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
+
+     
+    //Program will return TRUE, comparing a colour to a colour
+    strcpy(test->test_program[0], "IF");
+    strcpy(test->test_program[1], "COLOUR");
+    strcpy(test->test_program[2], ":=");
+    strcpy(test->test_program[3], "RED");
+    strcpy(test->test_program[4], "{");
+    strcpy(test->test_program[5], "}");
+    write_program(test);
+    test->condition = TRUE;
+    tester(test);
+    
+    if(test->pass == test->current){
+        return PASSED;
+    }
     return NOT_PASSED;
 }
 int test_if_letter(Test *test){
+    Prog program;
+    initialise_test(test, &program);
+    strcpy(test->name, "If_letter");
+    test->function = &if_letter;
+    
+    
+    //Program will return TRUE, passed a basic if statement for a letter
+    
+    strcpy(test->test_program[0], "A");
+    strcpy(test->test_program[1], ":=");
+    strcpy(test->test_program[2], "7");
+    strcpy(test->test_program[3], "{");
+    strcpy(test->test_program[4], "}");
+    write_program(test);
+    test->condition = TRUE;
+    tester(test);
+
+    //Program will return FALSE, passed a basic if statement for a colour
+    
+    strcpy(test->test_program[0], "COLOUR");
+    strcpy(test->test_program[1], ":=");
+    strcpy(test->test_program[2], "BLUE");
+    strcpy(test->test_program[3], "{");
+    strcpy(test->test_program[4], "}");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
+    
+    //Program will return FALSE, passed a letter compared to COLOUR
+    
+    strcpy(test->test_program[0], "G");
+    strcpy(test->test_program[1], ":=");
+    strcpy(test->test_program[2], "BLUE");
+    strcpy(test->test_program[3], "{");
+    strcpy(test->test_program[4], "}");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
+    
+
+    if(test->pass == test->current){
+        return PASSED;
+    }
     return NOT_PASSED;
+
 }
 int test_if_colour(Test *test){
+    Prog program;
+    initialise_test(test, &program);
+    strcpy(test->name, "If_colour");
+    test->function = &if_colour;
+    
+    
+    //Program will return TRUE, passed a basic if statement for colour
+    
+    strcpy(test->test_program[0], "COLOUR");
+    strcpy(test->test_program[1], ":=");
+    strcpy(test->test_program[2], "RED");
+    strcpy(test->test_program[3], "{");
+    strcpy(test->test_program[4], "}");
+    write_program(test);
+    test->condition = TRUE;
+    tester(test);
+
+    //Program will return FALSE, passed a basic if statement without a := sign
+    
+    strcpy(test->test_program[1], "equals");
+    strcpy(test->test_program[2], "9");
+    strcpy(test->test_program[3], "{");
+    strcpy(test->test_program[4], "}");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
+    
+    
+
+    if(test->pass == test->current){
+        return PASSED;
+    }
     return NOT_PASSED;
 }
 int test_assign_colour(Test *test){
+    //Tests each available colour
+    Prog program;
+    initialise_test(test, &program);    
+    
+    //Test assign WHITE
+    test->current += 1;
+    strcpy(test->program->colour, "WHITE");
+    assign_colour(test->program);
+    if(test->program->coordinate->red == 255 && test->program->coordinate->green == 255 && test->program->coordinate->blue == 255){
+        test->pass += 1;
+        fprintf(test->results, "\nAssign_colour test 1: Passed");
+    }
+    else{
+        fprintf(test->results, "\nAssign_colour test 1: Failed");
+    }
+
+    //Test assign RED
+    test->current += 1;
+    strcpy(test->program->colour, "RED");
+    assign_colour(test->program);
+    if(test->program->coordinate->red == 255 && test->program->coordinate->green == 0 && test->program->coordinate->blue == 0){
+        test->pass += 1;
+        fprintf(test->results, "\nAssign_colour test 2: Passed");
+    }
+    else{
+        fprintf(test->results, "\nAssign_colour test 2: Failed");
+    }
+
+    //Test assign GREEN
+    test->current += 1;
+    strcpy(test->program->colour, "GREEN");
+    assign_colour(test->program);
+    if(test->program->coordinate->red == 0 && test->program->coordinate->green == 255 && test->program->coordinate->blue == 0){
+        test->pass += 1;
+        fprintf(test->results, "\nAssign_colour test 3: Passed");
+    }
+    else{
+        fprintf(test->results, "\nAssign_colour test 3: Failed");
+    }
+    //Test assign BLUE
+    test->current += 1;
+    strcpy(test->program->colour, "BLUE");
+    assign_colour(test->program);
+    if(test->program->coordinate->red == 0 && test->program->coordinate->green == 0 && test->program->coordinate->blue == 255){
+        test->pass += 1;
+        fprintf(test->results, "\nAssign_colour test 4: Passed");
+    }
+    else{
+        fprintf(test->results, "\nAssign_colour test 4: Failed");
+    }
+    
+    if(test->pass == test->current){
+        return PASSED;
+    }
     return NOT_PASSED;
 }
 int test_set_colour(Test *test){
+    Prog program;
+    initialise_test(test, &program);
+    strcpy(test->name, "Set_colour");
+    test->function = &set_colour;
+    
+    
+    //Program will return TRUE, passed a basic if statement for colour
+    
+    strcpy(test->test_program[0], "COLOUR");
+    strcpy(test->test_program[1], ":=");    //Only matters from here
+    strcpy(test->test_program[2], "RED");
+    strcpy(test->test_program[3], ";");
+    write_program(test);
+    test->condition = TRUE;
+    tester(test);
+
+    //Program will return FALSE, missing := sign
+    
+    strcpy(test->test_program[0], "COLOUR");
+    strcpy(test->test_program[1], "to");    //Only matters from here
+    strcpy(test->test_program[2], "RED");
+    strcpy(test->test_program[3], ";");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
+    
+    //Program will return FALSE, invalid colour
+    
+    strcpy(test->test_program[0], "COLOUR");
+    strcpy(test->test_program[1], ":=");    //Only matters from here
+    strcpy(test->test_program[2], "INDIGO");
+    strcpy(test->test_program[3], ";");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
+
+    //Program will return FALSE, needs to end with ;
+    
+    strcpy(test->test_program[0], "COLOUR");
+    strcpy(test->test_program[1], ":=");    //Only matters from here
+    strcpy(test->test_program[2], "BLUE");
+    strcpy(test->test_program[3], "{");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
+    
+    //Program will return FALSE, doesn't set to antything
+    
+    strcpy(test->test_program[0], "COLOUR");
+    strcpy(test->test_program[1], ":=");    //Only matters from here
+    strcpy(test->test_program[2], ";");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
+
+    if(test->pass == test->current){
+        return PASSED;
+    }
     return NOT_PASSED;
 }
 int test_set_letter(Test *test){
+    Prog program;
+    initialise_test(test, &program);
+    strcpy(test->name, "Set_letter");
+    test->function = &set_letter;
+    
+    
+    //Program will return TRUE, passed a basic set letter to number
+    
+    strcpy(test->test_program[0], "K");
+    strcpy(test->test_program[1], ":=");    
+    strcpy(test->test_program[2], "8");
+    strcpy(test->test_program[3], ";");
+    write_program(test);
+    test->condition = TRUE;
+    tester(test);
+
+    //Program will return TRUE, passed a basic set letter to variable
+    
+    strcpy(test->test_program[0], "K");
+    strcpy(test->test_program[1], ":=");    
+    strcpy(test->test_program[2], "J");
+    strcpy(test->test_program[3], ";");
+    write_program(test);
+    test->condition = TRUE;
+    tester(test);
+
+    //Program will return FALSE, try to set letter to a word
+    
+    strcpy(test->test_program[0], "K");
+    strcpy(test->test_program[1], ":=");    
+    strcpy(test->test_program[2], "RED");
+    strcpy(test->test_program[3], ";");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
+    
+    //Program will return FALSE, try to set to nothing
+    
+    strcpy(test->test_program[0], "K");
+    strcpy(test->test_program[1], ":=");    
+    strcpy(test->test_program[2], ";");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
+
+    if(test->pass == test->current){
+        return PASSED;
+    }
     return NOT_PASSED;
 }
 
 int test_initialise_program(Test *test){
-    return NOT_PASSED;
+    Prog program;
+    initialise_program(&program);
+    if(program.current_word == NULL){
+        return NOT_PASSED;
+    }
+    if(program.start_coordinate.current_x != WINDOW_WIDTH/2){
+        return NOT_PASSED;
+    }
+    if(program.start_coordinate.current_y != WINDOW_HEIGHT/2){
+        return NOT_PASSED;
+    }
+    if(program.assign != TRUE){
+        return NOT_PASSED;
+    }
+    if(!strings_match(program.colour, "WHITE")){
+        return NOT_PASSED;
+    }
+    if(program.current_angle != 0){
+        return NOT_PASSED;
+    }
+    if(program.polish == NULL){
+        return NOT_PASSED;
+    }
+    for(int i = 0; i < LETTERS; i++){
+        if(program.variable[i] != 0){
+            return NOT_PASSED;
+        }
+    }
+    if(program.test != FALSE){
+        return NOT_PASSED;
+    }
+    return PASSED;
+
 }
 
-int test_push(FILE *test_pointer){
+int test_push(Test *test){
     Prog program;
-    int pass_count = 0, no_of_tests = 0;
-    initialise_program(&program);
+    initialise_test(test, &program);
+    
+    
     //Test should pass, is correct instruction followed by a number - the number is actually checked in a different function tested separately.
-    no_of_tests += 1;
+    test->current += 1;
     push(program.polish, 10);
     push(program.polish, 20);
     if(pop(&program) == 20){
         if(pop(&program) == 10){
-            pass_count += 1;
-            fprintf(test_pointer, "\nPush test 1: Passed");
+            test->pass += 1;
+            fprintf(test->results, "\nPush test 1: Passed");
         }
         else{
-            fprintf(test_pointer, "\nPush test 1: Failed");
+            fprintf(test->results, "\nPush test 1: Failed");
         }
     }
     else{
-        fprintf(test_pointer, "\nPush test 1: Failed");
+        fprintf(test->results, "\nPush test 1: Failed");
     }
     
     
     
-    if(pass_count == no_of_tests){
+    if(test->current == test->pass){
         return PASSED;
     }
     return NOT_PASSED; 
@@ -369,8 +528,76 @@ int test_push(FILE *test_pointer){
 
 
 int test_set_new_xy(Test *test){
+    //Tests an angle that falls into each of the different categories in the function.
+    Prog program;
+    initialise_test(test, &program);
+    test->program->current_length = 100;
+    test->program->coordinate->current_x = 100;
+    test->program->coordinate->current_y = 100;
+    //Test angle of 0
+    test->current += 1;
+    test->program->current_angle = 0;
+    set_new_xy(test->program);
+    printf("\nPROGRAM X COORD: %d\n", (int)test->program->coordinate->current_x);
+    printf("\nPROGRAM Y COORD: %d\n", (int)test->program->coordinate->current_y);
+    if(test->program->coordinate->current_x == 100 && test->program->coordinate->current_y == 0){
+            test->pass += 1;
+            fprintf(test->results, "\nSet_nex_xy test 1: Passed");
+        }
+    else{
+            fprintf(test->results, "\nSet_nex_xy test 1: Failed");
+    }
+    //Test angle of 90
+    test->current += 1;
+    test->program->coordinate->current_x = 100;
+    test->program->coordinate->current_y = 100;
+    test->program->current_angle = 90;
+    set_new_xy(test->program);
+    printf("\nPROGRAM X COORD: %d\n", (int)test->program->coordinate->current_x);
+    printf("\nPROGRAM Y COORD: %d\n", (int)test->program->coordinate->current_y);
+    if(test->program->coordinate->current_x == 200 && test->program->coordinate->current_y == 100){
+            test->pass += 1;
+            fprintf(test->results, "\nSet_nex_xy test 2: Passed");
+        }
+    else{
+            fprintf(test->results, "\nSet_nex_xy test 2: Failed");
+    }
+    //Test angle of 180
+    test->current += 1;
+    test->program->coordinate->current_x = 100;
+    test->program->coordinate->current_y = 100;
+    test->program->current_angle = 180;
+    set_new_xy(test->program);
+    printf("\nPROGRAM X COORD: %d\n", (int)test->program->coordinate->current_x);
+    printf("\nPROGRAM Y COORD: %d\n", (int)test->program->coordinate->current_y);
+    if(test->program->coordinate->current_x == 100 && test->program->coordinate->current_y == 200){
+            test->pass += 1;
+            fprintf(test->results, "\nSet_nex_xy test 3: Passed");
+        }
+    else{
+            fprintf(test->results, "\nSet_nex_xy test 3: Failed");
+    }
+    //Test angle of 270
+    test->current += 1;
+    test->program->coordinate->current_x = 100;
+    test->program->coordinate->current_y = 100;
+    test->program->current_angle = 270;
+    set_new_xy(test->program);
+    printf("\nPROGRAM X COORD: %d\n", (int)test->program->coordinate->current_x);
+    printf("\nPROGRAM Y COORD: %d\n", (int)test->program->coordinate->current_y);
+    if(test->program->coordinate->current_x == 0 && test->program->coordinate->current_y == 100){
+            test->pass += 1;
+            fprintf(test->results, "\nSet_nex_xy test 4: Passed");
+        }
+    else{
+            fprintf(test->results, "\nSet_nex_xy test 4: Failed");
+    }
+
+    if(test->current == test->pass){
+        return PASSED;
+    }
+    return NOT_PASSED; 
     
-    return NOT_PASSED;
 }
 
 int test_loop(Test *test){
@@ -437,19 +664,14 @@ int test_perform_loop(Test *test){
     
     //Program will return TRUE, basic loop
     
-    printf("\nBEFORE THE FIRST TEST.\n");
     test->program->loop[letter] = 'A';
     test->program->loop[start] = 1;
     test->program->loop[stop] = 2;
-    printf("\nBEFORE THE FIRST STRCPY.\n");
     strcpy(test->test_program[0], "{");//Needed for the function but not read
     strcpy(test->test_program[1], "}");
-    printf("\nBEFORE THE WRITE_PROGRAM.\n");
     write_program(test);
     test->condition = TRUE;
-    printf("\nBEFORE THE TESTER.\n");
     tester(test);
-    printf("\nAFTER THE TESTER.\n");
     
     //Program will return FALSE, start > end
    
@@ -652,8 +874,7 @@ int test_polish(Test *test){
     test->function = &polish;
     
     //Program will return TRUE, basic end of Polish expression passed
-    
-    
+    push(test->program->polish, 10); // Pop's a value if ; found so needs a value on the stack    
     strcpy(test->test_program[0], ";");
     write_program(test);
     test->condition = TRUE;
@@ -709,6 +930,7 @@ int test_pop(Test *test){
     Prog program;
     initialise_test(test, &program);
     //Function pops the last number off the stack return TRUE if it's equal to the last number pushed
+
     //Test should return FALSE, there is nothing in the stack
     test->current += 1;
     if(pop(test->program) == FALSE ){
@@ -718,8 +940,7 @@ int test_pop(Test *test){
     else{
         fprintf(test->results, "\npop test 1: Passed");
     }
-    
-    
+        
     //Test should return the number last popped onto stack
     test->current += 1;
     push(test->program->polish, 10);
@@ -788,6 +1009,7 @@ int test_op(Test *test){
     test->condition = FALSE;
     tester(test);
     
+    /*
     //Tests when the stack has too few numbers should return FALSE
     pop(test->program);
     
@@ -795,7 +1017,7 @@ int test_op(Test *test){
     write_program(test);
     test->condition = FALSE;
     tester(test);
-    
+    */
     if(test->pass == test->current){
         return PASSED;
     }
@@ -1067,13 +1289,6 @@ int test_is_number(Test *test){
     write_program(test);
     test->condition = FALSE;
     tester(test);
-    //Tests multiple decimal places should return FALSE
-    
-    strcpy(test->test_program[0], "4.3.2");
-    write_program(test);
-    test->condition = FALSE;
-    tester(test);
-
     //Tests just "-" sign should return FALSE
     
     strcpy(test->test_program[0], "-");
@@ -1164,60 +1379,33 @@ int test_varnum(Test *test){
     return NOT_PASSED;
 }
 
-int test_assign_draw(FILE *test_pointer){
-    /*  Not sure how to test this function
-    prog program;
-    int pass_count = 0, no_of_tests = 0;
-    initialise_words_array(&program);
-    
-    no_of_tests += 1;
-    program.current_angle = 90;
-    program.current_length = 50;
-    assign_draw(&program);
-    
-    strcpy(program.words[0], "FD");
-    strcpy(program.words[1], "ten");
-    if(fd(&program) == FALSE){
-        fprintf(test_pointer, "\nFD test 3: Passed");
-        pass_count += 1;
-    }
-    else{
-        fprintf(test_pointer, "\nFD test 3: Failed");
-    }
-    
-    if(pass_count == no_of_tests){
-        return PASSED;
-    }
-    return NOT_PASSED;
-    */
-    return PASSED;
-}
 
-int test_make_positive(FILE *test_pointer){
-
-    int pass_count = 0, no_of_tests = 0, test_number;
+int test_make_positive(Test *test){
+    Prog program;
+    int test_number;
+    initialise_test(test, &program);
     //Should always return a positive number, but not the positive version of the number given - is modded with 360 later.
-    no_of_tests += 1;
+    test->current += 1;
     test_number = 50;
     if(make_positive(test_number) > 0){
-        fprintf(test_pointer, "\nmake_positive test 1: Passed");
-        pass_count += 1;
+        fprintf(test->results, "\nmake_positive test 1: Passed");
+        test->pass += 1;
     }
     else{
-        fprintf(test_pointer, "\nmake_positive test 1: Failed");
+        fprintf(test->results, "\nmake_positive test 1: Failed");
     }
     
-    no_of_tests += 1;
+    test->current += 1;
     test_number = -50;
     if(make_positive(test_number) > 0){
-        fprintf(test_pointer, "\nmake_positive test 2: Passed");
-        pass_count += 1;
+        fprintf(test->results, "\nmake_positive test 2: Passed");
+         test->pass += 1;
     }
     else{
-        fprintf(test_pointer, "\nmake_positive test 2: Failed");
+        fprintf(test->results, "\nmake_positive test 2: Failed");
     }
     
-    if(pass_count == no_of_tests){
+    if(test->current == test->pass){
         return PASSED;
     }
     return NOT_PASSED;

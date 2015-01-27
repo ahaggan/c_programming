@@ -1,0 +1,35 @@
+{
+    DO A FROM 1 TO 200 {
+        FD A
+        RT 30
+        IF A := 20 {
+            SET COLOUR := RED ;
+        }
+        IF A := 40 {
+            SET COLOUR := GREEN ;
+        }
+        IF A := 60 {
+            SET COLOUR := BLUE ;
+        }
+        IF A := 80 {
+            SET COLOUR := WHITE ;
+        }
+        IF A := 100 {
+            SET COLOUR := RED ;
+        }
+        IF A := 120 {
+            SET COLOUR := GREEN ;
+        }
+        IF A := 140 {
+            SET COLOUR := BLUE ;
+        }
+        IF A := 160 {
+            SET COLOUR := WHITE ;
+        }
+        IF A := 180 {
+            SET COLOUR := RED ;
+        }
+        
+    }
+    
+}

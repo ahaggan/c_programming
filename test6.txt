@@ -1,0 +1,10 @@
+{
+    SET COLOUR := RED ;
+    RT 50
+    FD 10
+    DO A FROM 3 TO 19 {
+        SET COLOUR := GREEN ;
+        RT 50
+        FD 10
+    }
+}

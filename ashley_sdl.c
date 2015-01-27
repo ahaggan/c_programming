@@ -66,7 +66,6 @@ void draw_turtle(Prog *program){
     program->coordinate = &program->start_coordinate;
     do{
         //Checks the program still contains instruction to draw, otherwise the loop waits for the user to stop it.
-        
         if(program->coordinate->next != NULL){ 
             startx = program->coordinate->current_x;
             starty = program->coordinate->current_y;
@@ -78,16 +77,11 @@ void draw_turtle(Prog *program){
             endx = program->coordinate->current_x;
             endy = program->coordinate->current_y;
            
-            
-            //printf("\nStart x: %lf", startx);
-            //printf("\nStart y: %lf", starty);
-            //printf("\nEnd x: %lf", endx);
-            //printf("\nEnd y: %lf", endy);
             SDL_RenderDrawLine(sw.renderer, startx, starty, endx, endy);
-            // Sleep for a short time
+          
             SDL_Delay(MILLISECONDDELAY);
 
-           
+            //free(program->coordinate->previous);
           
 
           
