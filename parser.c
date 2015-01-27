@@ -4,8 +4,8 @@ int main(int argc, char **argv){
    	
     Prog program;
     
-    initialise_words_array(&program);
     
+    initialise_program(&program);
     program.file_pointer = check_input(&program, argc, argv);
     
     if(program.file_pointer == NULL){
@@ -17,6 +17,7 @@ int main(int argc, char **argv){
     }
     else{
         if(parse(&program) == TRUE){
+            
             draw_turtle(&program);
             return 0;
         }
@@ -25,13 +26,32 @@ int main(int argc, char **argv){
     
 }
 
+FILE* check_input(Prog *program, int argc, char **argv){
+    FILE *file_pointer = NULL;
+    
+    if(!(argc == 2)){
+        fprintf(stdout, "\nYou must enter 2 commands:\n   the first should be the executable file,\n   the second should be the text file to read from,\n   or, if wanted should be the word 'test' this will run the test function");
+        return NULL;
+    }
+    
+    if(strings_match(argv[1], "test")){
+        program->test = TRUE;
+        return NULL;
+    }
+    if((file_pointer = fopen(argv[1], "r")) == NULL){
+        fprintf(stdout, "\nCan't open the file you have specified");
+        return NULL;
+    }
+    return file_pointer;
+}
+
 int parse(Prog *program){
     
     words *new_word;
     words *previous_word;
     
     program->current_word = &program->start_word;
-    //printf("\nWORD: %s\n", fscanf(program->file_pointer, "%s", program->current_word->current));
+    //Loop creates a linked list of the program
     while(fscanf(program->file_pointer, "%s", program->current_word->current) != EOF){
         new_word = (words*)malloc(sizeof(words));
         previous_word = program->current_word;
@@ -39,18 +59,11 @@ int parse(Prog *program){
         program->current_word = new_word;
         program->current_word->previous = previous_word;
     }
-    /*if(i == PROGRAM_LENGTH){
-        fprintf(stdout, "\nYour program may be too long for the parser to handle.\n");
-    }*/
-    program->current_word = &program->start_word;
-    while(program->current_word->current != NULL){
-        printf("\nCurrent word: %s", program->current_word->current);
-        program->current_word = program->current_word->next;
-    }
+    program->current_word = &program->start_word; //Sets the current word to the beginning of the linked list
+  
     if (validate(program) == FALSE){
         return FALSE;
     }
-    
     
     fprintf(stdout, "\nPARSED OK!");
     return TRUE;
@@ -66,12 +79,6 @@ int validate(Prog *program){
     }
     program->current_word = program->current_word->next;
     if(instrctlst(program) == FALSE){
-        /*if (program->words[program->current_word][0] == '\0'){
-            fprintf(stdout, "\nA program needs to end with a }.");
-        }
-        else{
-            fprintf(stdout, "\nInstruction %s is not valid.", program->words[program->current_word]);
-        } */
         return FALSE;
     }
     return TRUE;
@@ -122,7 +129,7 @@ int instruction(Prog *program){
     }
     else{
 //Not sure wether to include this error
-        fprintf(stdout, "\nERROR around the word '%s'", program->current_word->current);   //NEED TO LOOK HOW TO GIVE END MESSAGE
+        fprintf(stdout, "\nERROR around the word '%s'\n", program->current_word->current);   //NEED TO LOOK HOW TO GIVE END MESSAGE
         program->current_word = program->current_word->next;
     }
     return FALSE;
@@ -261,7 +268,7 @@ int if_letter(Prog *program){
         return FALSE;
     }
     if(program->variable[variable_index_check] != result){
-        fprintf(stdout, "\nIf statement failed\n");
+        
         program->assign = FALSE;
     }
     
@@ -363,7 +370,7 @@ int set_colour(Prog *program){
     program->current_word = program->current_word->next; 
     for(i = 0; i < COLOUR_CHOICE; i++){
         if(strings_match(program->current_word->current, colours[i])){
-            printf("\nassign value is %d.\n", program->assign);
+            
             if(program->assign == TRUE){
                 strcpy(program->colour, colours[i]);
             }
@@ -707,7 +714,7 @@ int is_var(Prog *program){
     return FALSE;
 }
 
-void initialise_words_array(Prog *program){
+void initialise_program(Prog *program){
     int i;
     program->current_word = (words*)malloc(sizeof(words));
     program->start_coordinate.current_x = WINDOW_WIDTH/2;
@@ -728,21 +735,4 @@ void initialise_words_array(Prog *program){
     
 }
 
-FILE* check_input(Prog *program, int argc, char **argv){
-    FILE *file_pointer = NULL;
-    
-    if(!(argc == 2)){
-        fprintf(stdout, "\nYou must enter 2 commands:\n   the first should be the executable file,\n   the second should be the text file to read from,\n   or, if wanted should be the word 'test' this will run the test function");
-        return NULL;
-    }
-    
-    if(strings_match(argv[1], "test")){
-        program->test = TRUE;
-        return NULL;
-    }
-    if((file_pointer = fopen(argv[1], "r")) == NULL){
-        fprintf(stdout, "\nCan't open the file you have specified");
-        return NULL;
-    }
-    return file_pointer;
-}
+

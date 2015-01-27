@@ -17,11 +17,11 @@ void test(void){
         print_outcome(test.results, "Check_input", "FAILED");
     }   
     
-    if (test_words_array(&test) == PASSED){
-        print_outcome(test.results, "Test_words_array", "PASSED");
+    if (test_initialise_program(&test) == PASSED){
+        print_outcome(test.results, "Test_initialise_program", "PASSED");
     }
     else{
-        print_outcome(test.results, "Test_words_array", "FAILED");
+        print_outcome(test.results, "Test_initialise_program", "FAILED");
     }
     
     if(test_validate(&test) == PASSED){
@@ -240,7 +240,7 @@ void print_outcome(FILE *test_pointer, char *test, char *outcome){
 
 void initialise_test(Test *test, Prog *program){
     test->program = program;
-    initialise_words_array(test->program);
+    initialise_program(test->program);
     test->current = 0;
     test->pass = 0;
 }
@@ -272,10 +272,14 @@ int test_parse(Test *test){
     return NOT_PASSED;
 }
 
+int test_initialise_program(Test *test){
+    return NOT_PASSED;
+}
+
 int test_push(FILE *test_pointer){
     Prog program;
     int pass_count = 0, no_of_tests = 0;
-    initialise_words_array(&program);
+    initialise_program(&program);
     //Test should pass, is correct instruction followed by a number - the number is actually checked in a different function tested separately.
     no_of_tests += 1;
     push(program.polish, 10);
@@ -1008,6 +1012,13 @@ int test_is_number(Test *test){
     write_program(test);
     test->condition = FALSE;
     tester(test);
+
+    //Tests just "-" sign should return FALSE
+    
+    strcpy(test->test_program[0], "-");
+    write_program(test);
+    test->condition = FALSE;
+    tester(test);
     
     if(test->pass == test->current){
         return PASSED;
@@ -1438,7 +1449,7 @@ Tests need to check that the function only works if the program starts with a {,
 
 
 
-int test_words_array(Test *test){
+int test_program(Test *test){
     
             return NOT_PASSED;
     

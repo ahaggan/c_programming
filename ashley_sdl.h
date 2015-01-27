@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "SDL2/SDL.h"
 #define MILLISECONDDELAY 50
 #define SDL_8BITCOLOUR 256
 
