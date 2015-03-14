@@ -1,4 +1,4 @@
-//Most functions taken from Neill_sdl.c, these have Neill in the function name, added draw_turtle here to avoid having SDL in my main parser.c function.
+//Some functions taken from Neill_sdl.c, these have Neill in the function name
 
 #include "ashley_sdl.h"
 

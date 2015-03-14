@@ -1,6 +1,6 @@
 {
     DO G FROM 0 TO 90 {
-        FD G
+        FD 10
         RT 60
         IF G := 70 {
             SET COLOUR := RED ;

@@ -12,13 +12,13 @@ parse test 8: Passed
 **Test parse function PASSED!**
 
 
-Input test 1: Failed
+Input test 1: Passed
 Input test 2: Passed
 Input test 3: Passed
 Input test 4: Passed
 Input test 5: Passed
 
-**Test check input function FAILED!**
+**Test check input function PASSED!**
 
 
 
@@ -264,6 +264,6 @@ Set_letter test 4: Passed
 **Test set letter function PASSED!**
 
 
-NUMBER OF TESTS PASSED: 33
+NUMBER OF TESTS PASSED: 34
 
-NUMBER OF TESTS FAILED: 1
+NUMBER OF TESTS FAILED: 0

@@ -1,0 +1,11 @@
+{
+    DO A FROM 1 TO 50 {
+        FD A
+        RT 30
+        SET A := 5 ;
+        IF A := 5 {
+            FD 10
+        }
+   }
+    
+}

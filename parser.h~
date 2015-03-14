@@ -89,8 +89,7 @@ typedef struct Prog{
     FILE *file_pointer;
     double variable[LETTERS]; //array containing each of the program variables
     double result;
-    //Used to hold the start and stop values for a loop and the letter being used for the loop
-    condition loop[CONDITIONS]; 
+    condition loop[CONDITIONS];
     stack *polish;
 }Prog;
 /*
@@ -100,11 +99,8 @@ If the user has entered their own file, if it is parsed correctly the main funct
 */
 
 /*
-
 Functions called outside the parser
-
 */
-
 //This function is called if a user has intered a file to be parsed. It scans the file into the linked list and then sends the linked list to the parser to parse. Returns TRUE if parsed correctly.
 int parse(Prog *program);
 //Called by the main function to check the users input to the command line, returns NULL or the file pointer to the users file
@@ -116,7 +112,7 @@ Functions used at the end of the program to free all malloced space
 */
 void free_space(Prog *program);
 
-
+void free_words(words *start);
 /*
 
 These functions form the parser

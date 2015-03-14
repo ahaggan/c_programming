@@ -1,8 +1,8 @@
 {
     SET COLOUR := BLUE ;
     RT 50
-    FD 50
+    FD 10
     SET COLOUR := RED ;
     RT 50
-    FD 50
+    FD 10
 }

@@ -106,7 +106,7 @@ int parse(Prog *program){
         program->current_word->previous = previous_word;
     }
     program->current_word = &program->start_word; //Sets the current word to the beginning of the linked list/program
-    
+    fclose(program->file_pointer);
     if (validate(program) == FALSE){
         return FALSE;
     }

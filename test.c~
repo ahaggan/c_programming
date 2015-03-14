@@ -22,6 +22,14 @@ void test(void){
     fprintf(test.results, "\nNUMBER OF TESTS PASSED: %d\n", test.no_passed);
     fprintf(test.results, "\nNUMBER OF TESTS FAILED: %d\n", test.no_failed);
     fclose(test.results);
+    
+    
+    /*
+    if(test_assign_draw(&test) == PASSED){ //Not sure how to test this?
+    
+    
+    */
+
    
 }
 
