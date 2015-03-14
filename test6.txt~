@@ -1,9 +1,0 @@
-{
-    SET COLOUR := RED ;
-    FD 100
-    DO A FROM 1 TO 100 {
-        SET COLOUR := GREEN ;
-        RT 62
-        FD A
-    }
-}
